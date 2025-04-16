@@ -1,5 +1,6 @@
 body {
     background-color: black;
+    font-family: "FreeSans", "Helvetica", "Arial", sans-serif;
 }
 
 main {
@@ -10,4 +11,5 @@ main {
     align-items: safe stretch;
     justify-content: safe center;
     padding: 10px;
+    overflow: hidden auto;
 }

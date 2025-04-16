@@ -1,5 +1,10 @@
 (() => {
 
+    function formatTime(seconds) {
+        return Math.floor(seconds / 60).toString().padStart(2, "0")
+            + ":" + Math.floor(seconds % 60).toString().padStart(2, "0")
+    }
+
     /** @param {ArrayBuffer} buffer  */
     function readMetadata(buffer) {
         metadata = { info: {}, tags: [] };
@@ -193,10 +198,12 @@
     class MusicPlayerElement extends HTMLElement {
         #updateHandle = 0;
     
+        /** @type {Record<string, HTMLElement>} */
         #elms = null;
         #audioContext = null;
         /** @type {AnalyserNode[]} */
         #analysers = [];
+        #dragTime = null;
     
         constructor() {
           super();
@@ -205,11 +212,19 @@
         connectedCallback() {
             if (!this.#elms) 
             {
-                this.#elms = {};
                 this.innerHTML = `
                     <audio class="mp_audio"></audio>
+                    <div class="mp_backgrounds"></div>
                     <canvas class="mp_canvas"></canvas>
                     <div class="mp_notify"></div>
+                    <section class="mp_controls">
+                        <div class="mp_progress">
+                            <span class="mp_info_time"></span>
+                            <span class="mp_info_duration"></span>
+                        </div>
+                        <div class="mp_buttons">
+                        </div>
+                    </section>
                     <section class="mp_info">
                         <div>
                             <button class="mp_play-pause-button">
@@ -224,14 +239,25 @@
                         </div>
                     </section>
                 `
-                this.#elms.audio = this.querySelector(".mp_audio");
-                this.#elms.canvas = this.querySelector(".mp_canvas");
-                this.#elms.notify = this.querySelector(".mp_notify");
-                this.#elms.playPauseButton = this.querySelector(".mp_play-pause-button");
-                this.#elms.playPauseArt = this.querySelector(".mp_play-pause-art");
-                this.#elms.infoTitle = this.querySelector(".mp_info_title");
-                this.#elms.infoArtist = this.querySelector(".mp_info_artist");
-                this.#elms.infoAlbum = this.querySelector(".mp_info_album");
+                this.#elms = {
+                    audio: this.querySelector(".mp_audio"),
+                    canvas: this.querySelector(".mp_canvas"),
+                    notify: this.querySelector(".mp_notify"),
+                    backgrounds: this.querySelector(".mp_backgrounds"),
+                    playPauseButton: this.querySelector(".mp_play-pause-button"),
+                    playPauseArt: this.querySelector(".mp_play-pause-art"),
+                    progress: this.querySelector(".mp_progress"),
+                    infoTime: this.querySelector(".mp_info_time"),
+                    infoDuration: this.querySelector(".mp_info_duration"),
+                    infoTitle: this.querySelector(".mp_info_title"),
+                    infoArtist: this.querySelector(".mp_info_artist"),
+                    infoAlbum: this.querySelector(".mp_info_album"),
+                }
+
+                this.#elms.audio.addEventListener("play", (data) => this.#onPlayStateChanged(data));
+                this.#elms.audio.addEventListener("pause", (data) => this.#onPlayStateChanged(data));
+                this.#elms.audio.addEventListener("timeupdate", (data) => this.#onProgressChanged(data));
+                this.#elms.audio.addEventListener("durationchange", (data) => this.#onProgressChanged(data));
 
                 this.addEventListener("dragover", (data) => {
                     data.preventDefault();
@@ -250,11 +276,26 @@
                         }
                     }
                 }); 
-                this.#elms.audio.addEventListener("play", (data) => this.#onPlayStateChanged(data));
-                this.#elms.audio.addEventListener("pause", (data) => this.#onPlayStateChanged(data));
+
                 this.#elms.playPauseButton.addEventListener("click", (data) => {
                     if (this.#elms.audio.paused) this.#elms.audio.play();
                     else this.#elms.audio.pause();
+                });
+                this.#elms.progress.addEventListener("pointerdown", (data) => {
+                    this.#elms.progress.setPointerCapture(data.pointerId);
+                    this.#dragTime = Math.min(1, Math.max(0, data.offsetX / this.#elms.progress.clientWidth)) * this.#elms.audio.duration;
+                    this.#onProgressChanged();
+                });
+                this.#elms.progress.addEventListener("pointermove", (data) => {
+                    if (this.#dragTime !== null) {
+                        this.#dragTime = Math.min(1, Math.max(0, data.offsetX / this.#elms.progress.clientWidth)) * this.#elms.audio.duration;
+                        this.#onProgressChanged();
+                    }
+                });
+                this.#elms.progress.addEventListener("pointerup", (data) => {
+                    this.#elms.progress.releasePointerCapture(data.pointerId);
+                    this.#elms.audio.currentTime = this.#dragTime;
+                    this.#dragTime = null;
                 });
                 this.#elms.notify.textContent = "Drop an audio file here";
             }
@@ -267,26 +308,42 @@
         /** @param {File} file  */
         playFile(file) {
             this.#elms.notify.textContent = "";
-            this.#elms.audio.src = URL.createObjectURL(file);
             this.#elms.infoTitle.textContent = file.name;
             this.#elms.infoArtist.textContent = this.#elms.infoAlbum.textContent = "";
-            this.#elms.playPauseArt.removeAttribute("src")
+            this.#elms.playPauseArt.removeAttribute("src");
+            if (this.#elms.background) {
+                let bg = this.#elms.background;
+                bg.style.setProperty("--mp__progress", this.style.getPropertyValue("--mp__progress"));
+                bg.classList.add("mp_fading");
+                setTimeout(() => bg.remove(), 4000);
+                this.#elms.background = null;
+            }
             file.arrayBuffer().then(x => readMetadata(x)).then((data) => {
                 if (data.info.trackTitle) this.#elms.infoTitle.textContent = data.info.trackTitle;
                 if (data.info.trackAuthor) this.#elms.infoArtist.textContent = data.info.trackAuthor;
                 if (data.info.albumTitle) this.#elms.infoAlbum.textContent = data.info.albumTitle;
                 if (data.info.mainPicture) data.info.mainPicture.register(() => {
-                    this.#elms.playPauseArt.src = data.info.mainPicture.image
+                    let background = document.createElement("img");
+                    background.src = this.#elms.playPauseArt.src = data.info.mainPicture.image;
+                    this.#elms.backgrounds.append(this.#elms.background = background);
                 });
             }).catch(console.log);
 
+            this.#elms.audio.src = URL.createObjectURL(file);
             this.#elms.audio.play().then(() => {
                 if (!this.#audioContext) this.#initiateAudioContext();
             }).catch(() => this.#doClickToPlay());
         }
 
-        #onPlayStateChanged(data) {
+        #onPlayStateChanged() {
             this.classList.toggle("mp__playing", !this.#elms.audio.paused);
+        }
+
+        #onProgressChanged() {
+            let time = this.#dragTime ?? this.#elms.audio.currentTime;
+            this.style.setProperty("--mp__progress", time / this.#elms.audio.duration);
+            this.#elms.infoTime.textContent = formatTime(time);
+            this.#elms.infoDuration.textContent = formatTime(this.#elms.audio.duration);
         }
 
         #initiateAudioContext() {
@@ -307,12 +364,15 @@
             delay.delayTime.setValueAtTime(4096 / context.sampleRate, 0);
             src.connect(delay);
             delay.connect(context.destination);
+            this.classList.add("mp__initialized");
         }
 
         #doClickToPlay() {
             function callback(data) {
                 this.#elms.notify.textContent = "";
-                this.#elms.audio.play();
+                this.#elms.audio.play().then(() => {
+                    if (!this.#audioContext) this.#initiateAudioContext();
+                }).catch(() => this.#doClickToPlay());
                 this.removeEventListener("click", callback);
             }
             this.#elms.notify.textContent = "Press here to play music";
@@ -330,7 +390,7 @@
             let height = this.#elms.canvas.height = this.#elms.canvas.clientHeight * scale;
             let canvas = this.#elms.canvas.getContext("2d");
 
-            canvas.strokeStyle = "#fff7";
+            canvas.strokeStyle = "#ffff";
             canvas.lineWidth = 2 * scale;
             canvas.lineJoin = "round";
 
@@ -339,15 +399,15 @@
                 if (!analyser) return;
                 let array = new Float32Array(analyser.frequencyBinCount);
                 analyser.getFloatFrequencyData(array);
-                let getValue = (x) => (2 ** (array[x] / 10 + 1.5));
+                let getValue = (x) => (2 ** (array[x] / 10 + 9));
                 canvas.beginPath();
-                canvas.moveTo(start * width, (1 - getValue(0)) * height + scale);
+                canvas.moveTo(start * width, height - (getValue(0) - 1) * scale);
                 let count = 256;
                 let step = (end - start) / (count - 1);
                 for (let x = 1; x < count; x++) 
                 {
                     start += step;
-                    canvas.lineTo(start * width, (1 - getValue(x)) * height + scale);
+                    canvas.lineTo(start * width, height - (getValue(x) - 1) * scale);
                 }
                 canvas.stroke();
             }

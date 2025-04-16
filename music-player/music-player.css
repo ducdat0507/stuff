@@ -7,7 +7,8 @@ duducat-music-player {
     position: relative;
     display: block;
     border: 2px solid white;
-    background: #112;
+    background: 
+        #112 linear-gradient(#fff2, #fff2) 0% 0% / calc(100% * var(--mp__progress)) 100% no-repeat;
     color: white;
 }
 
@@ -31,13 +32,14 @@ duducat-music-player .mp_canvas {
 
 duducat-music-player .mp_info {
     padding: 10px;
+    bottom: auto;
     display: flex;
     gap: 6px;
 }
 duducat-music-player .mp_play-pause-button {
     position: relative;
-    width: 50px;
-    height: 50px;
+    width: 5em;
+    height: 5em;
     background: #fff2;
     border: none;
     border-radius: 0;
@@ -53,12 +55,88 @@ duducat-music-player .mp_play-pause-art:not([src]) {
     display: none;
 }
 duducat-music-player .mp_play-pause-icon {
+    background: linear-gradient(#fff3, #fff0);
     box-shadow: inset 0 0 0 2px #fff3;
 }
-duducat-music-player .mp_info :is(p, h2) {
+duducat-music-player .mp_info h2 {
+    font-size: 1.0em;
+    margin: 0;
+}
+duducat-music-player .mp_info p {
     font-size: 0.8em;
     margin: 0;
 }
 duducat-music-player .mp_info_album {
     opacity: .6;
+    font-style: italic;
+}
+
+duducat-music-player img {
+    object-fit: cover;
+    object-position: calc(100% * var(--mp__progress)) calc(100% * var(--mp__progress));
+}
+duducat-music-player :is(.mp_backgrounds, .mp_controls) {
+    overflow: hidden;
+}
+duducat-music-player .mp_backgrounds img {
+    position: absolute;
+    width: calc(100% + 40px);
+    height: calc(100% + 40px);
+    inset: -20px;
+    filter: blur(40px);
+    opacity: .5;
+    animation: fade-in 4s;
+    transition: opacity 4s;
+}
+duducat-music-player .mp_backgrounds img.mp_fading {
+    opacity: 0;
+}
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    } to {
+        opacity: .5;
+    }
+}
+
+duducat-music-player .mp_progress {
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(#0000, #fff3) 0% 0% / calc(100% * var(--mp__progress)) 100% no-repeat,
+        linear-gradient(#0000, #0007) 100% 0% / calc(100% * calc(1 - var(--mp__progress))) 100% no-repeat;
+    opacity: 0;
+    transition: opacity .3s, height .3s;
+    transition-timing-function: ease-out;
+    font-size: .8em;
+    position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+}
+duducat-music-player .mp_progress .mp_info_time {
+    position: absolute;
+    padding: 2px 6px;
+    bottom: -20px;
+    left: 0;
+    transition: bottom .3s;
+}
+duducat-music-player .mp_progress .mp_info_duration {
+    position: absolute;
+    padding: 2px 6px;
+    bottom: -20px;
+    right: 0;
+    transition: bottom .3s;
+}
+duducat-music-player:is(:hover, :not(.mp__playing)) .mp_progress :is(.mp_info_time, .mp_info_duration) {
+    bottom: 0;
+}
+duducat-music-player:is(:hover, :not(.mp__playing)) .mp_progress {
+    height: calc(100% - 32px);
+    opacity: 1;
+}
+duducat-music-player .mp_buttons {
+    height: 32px;
+    background: linear-gradient(#2228, #111a);
+    backdrop-filter: blur(15px);
+    box-shadow: inset 0 1px #fff5;
 }
