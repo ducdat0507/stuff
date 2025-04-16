@@ -10,6 +10,8 @@ duducat-music-player {
     background: 
         #112 linear-gradient(#fff2, #fff2) 0% 0% / calc(100% * var(--mp__progress)) 100% no-repeat;
     color: white;
+    user-select: none;
+    -webkit-user-select: none;
 }
 
 duducat-music-player > * {
@@ -110,8 +112,6 @@ duducat-music-player .mp_progress {
     transition-timing-function: ease-out;
     font-size: .8em;
     position: relative;
-    user-select: none;
-    -webkit-user-select: none;
 }
 duducat-music-player .mp_progress .mp_info_time {
     position: absolute;
