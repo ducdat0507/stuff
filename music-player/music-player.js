@@ -114,9 +114,8 @@
                     }
                 }
             }
-        }
-        else if (dec.decode(buffer.slice(0, 3)) == "ID3") {
-            let totalLength = dv.getUint8(6) << 21 + dv.getUint8(7) << 14 + dv.getUint8(8) << 7 + dv.getUint8(9);
+        } else if (dec.decode(buffer.slice(0, 3)) == "ID3") {
+            let totalLength = dv.getUint8(6) << 21 | dv.getUint8(7) << 14 | dv.getUint8(8) << 7 | dv.getUint8(9);
             console.log(totalLength);
             let offset = 10;
             if (dv.getUint8(5) & 64) offset += dv.getUint32(10);
