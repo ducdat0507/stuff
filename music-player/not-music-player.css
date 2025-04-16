@@ -1,0 +1,13 @@
+body {
+    background-color: black;
+}
+
+main {
+    position: fixed; 
+    inset: 0; 
+    display: flex; 
+    flex-flow: column; 
+    align-items: safe stretch;
+    justify-content: safe center;
+    padding: 10px;
+}

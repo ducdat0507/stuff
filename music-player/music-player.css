@@ -1,0 +1,64 @@
+duducat-music-player, duducat-music-player * {
+    box-sizing: border-box;
+    line-height: 1.3em;
+}
+
+duducat-music-player {
+    position: relative;
+    display: block;
+    border: 2px solid white;
+    background: #112;
+    color: white;
+}
+
+duducat-music-player > * {
+    position: absolute;
+    inset: 0;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+duducat-music-player :is(noscript, .mp_notify) {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+duducat-music-player .mp_canvas {
+    width: 100%;
+    height: 100%;
+}
+
+duducat-music-player .mp_info {
+    padding: 10px;
+    display: flex;
+    gap: 6px;
+}
+duducat-music-player .mp_play-pause-button {
+    position: relative;
+    width: 50px;
+    height: 50px;
+    background: #fff2;
+    border: none;
+    border-radius: 0;
+    margin: 0;
+}
+duducat-music-player .mp_play-pause-button > * {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+}
+duducat-music-player .mp_play-pause-art:not([src]) {
+    display: none;
+}
+duducat-music-player .mp_play-pause-icon {
+    box-shadow: inset 0 0 0 2px #fff3;
+}
+duducat-music-player .mp_info :is(p, h2) {
+    font-size: 0.8em;
+    margin: 0;
+}
+duducat-music-player .mp_info_album {
+    opacity: .6;
+}
