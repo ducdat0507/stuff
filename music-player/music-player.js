@@ -194,6 +194,7 @@
         #updateHandle = 0;
     
         #elms = null;
+        #audioContext = null;
         /** @type {AnalyserNode[]} */
         #analysers = [];
     
@@ -232,30 +233,12 @@
                 this.#elms.infoArtist = this.querySelector(".mp_info_artist");
                 this.#elms.infoAlbum = this.querySelector(".mp_info_album");
 
-                let context = new AudioContext();
-                let src = context.createMediaElementSource(this.#elms.audio);
-                let splitter = context.createChannelSplitter(2);
-                src.connect(splitter);
-                for (let a = 0; a < 2; a++) 
-                {
-                    var analyser = context.createAnalyser();
-                    analyser.fftSize = 8192;
-                    analyser.smoothingTimeConstant = 0;
-                    
-                    splitter.connect(analyser, a, 0);
-                    this.#analysers.push(analyser);
-                }
-                let delay = context.createDelay();
-                delay.delayTime.setValueAtTime(4096 / context.sampleRate, 0);
-                src.connect(delay);
-                delay.connect(context.destination);
-
                 this.addEventListener("dragover", (data) => {
                     data.preventDefault();
                 });
                 this.addEventListener("drop", (data) => {
                     data.preventDefault();
-
+    
                     if (data.dataTransfer.items) {
                         for (let item of data.dataTransfer.items) {
                             console.log(item.type);
@@ -267,7 +250,6 @@
                         }
                     }
                 }); 
-
                 this.#elms.audio.addEventListener("play", (data) => this.#onPlayStateChanged(data));
                 this.#elms.audio.addEventListener("pause", (data) => this.#onPlayStateChanged(data));
                 this.#elms.playPauseButton.addEventListener("click", (data) => {
@@ -298,12 +280,33 @@
                 });
             }).catch(console.log);
 
-            this.#elms.audio.play();
-            if (this.#elms.audio.paused) this.#doClickToPlay();
+            this.#elms.audio.play().then(() => {
+                if (!this.#audioContext) this.#initiateAudioContext();
+            }).catch(() => this.#doClickToPlay());
         }
 
         #onPlayStateChanged(data) {
             this.classList.toggle("mp__playing", !this.#elms.audio.paused);
+        }
+
+        #initiateAudioContext() {
+            let context = this.#audioContext = new AudioContext();
+            let src = context.createMediaElementSource(this.#elms.audio);
+            let splitter = context.createChannelSplitter(2);
+            src.connect(splitter);
+            for (let a = 0; a < 2; a++) 
+            {
+                var analyser = context.createAnalyser();
+                analyser.fftSize = 8192;
+                analyser.smoothingTimeConstant = 0;
+                
+                splitter.connect(analyser, a, 0);
+                this.#analysers.push(analyser);
+            }
+            let delay = context.createDelay();
+            delay.delayTime.setValueAtTime(4096 / context.sampleRate, 0);
+            src.connect(delay);
+            delay.connect(context.destination);
         }
 
         #doClickToPlay() {
@@ -333,6 +336,7 @@
 
             let drawFrequency = (channel, start, end) => {
                 let analyser = this.#analysers[channel];
+                if (!analyser) return;
                 let array = new Float32Array(analyser.frequencyBinCount);
                 analyser.getFloatFrequencyData(array);
                 let getValue = (x) => (2 ** (array[x] / 10 + 1.5));
