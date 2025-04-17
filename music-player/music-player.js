@@ -204,6 +204,12 @@
         /** @type {AnalyserNode[]} */
         #analysers = [];
         #dragTime = null;
+
+        #time = performance.now();
+        #data = [...new Array(512)].map(_ => ({
+            value: 0,
+            velocity: 0
+        }));
     
         constructor() {
           super();
@@ -283,19 +289,24 @@
                 });
                 this.#elms.progress.addEventListener("pointerdown", (data) => {
                     this.#elms.progress.setPointerCapture(data.pointerId);
+                    this.classList.add("mp__seeking");
                     this.#dragTime = Math.min(1, Math.max(0, data.offsetX / this.#elms.progress.clientWidth)) * this.#elms.audio.duration;
+                    this.#elms.audio.currentTime = this.#dragTime;
                     this.#onProgressChanged();
                 });
                 this.#elms.progress.addEventListener("pointermove", (data) => {
                     if (this.#dragTime !== null) {
                         this.#dragTime = Math.min(1, Math.max(0, data.offsetX / this.#elms.progress.clientWidth)) * this.#elms.audio.duration;
+                        this.#elms.audio.currentTime = this.#dragTime;
                         this.#onProgressChanged();
                     }
                 });
                 this.#elms.progress.addEventListener("pointerup", (data) => {
-                    this.#elms.progress.releasePointerCapture(data.pointerId);
-                    this.#elms.audio.currentTime = this.#dragTime;
-                    this.#dragTime = null;
+                    if (this.#dragTime !== null) {
+                        this.#elms.progress.releasePointerCapture(data.pointerId);
+                        this.classList.remove("mp__seeking");
+                        this.#dragTime = null;
+                    }
                 });
                 this.#elms.notify.textContent = "Drop an audio file here";
             }
@@ -384,36 +395,94 @@
         }
     
         $update() {
+            let delta = performance.now() - this.#time;
+            this.#time += delta;
+            delta /= 1000;
+
             this.#updateHandle = requestAnimationFrame(() => this.$update());
             let scale = window.devicePixelRatio ?? 1;
             let width = this.#elms.canvas.width = this.#elms.canvas.clientWidth * scale;
             let height = this.#elms.canvas.height = this.#elms.canvas.clientHeight * scale;
             let canvas = this.#elms.canvas.getContext("2d");
 
-            canvas.strokeStyle = "#ffff";
-            canvas.lineWidth = 2 * scale;
-            canvas.lineJoin = "round";
+            let bars = [...new Array(this.#data.length)].map(_ => 0);
 
-            let drawFrequency = (channel, start, end) => {
+            let drawFrequency = (channel, start, end, count, strength) => {
                 let analyser = this.#analysers[channel];
                 if (!analyser) return;
                 let array = new Float32Array(analyser.frequencyBinCount);
                 analyser.getFloatFrequencyData(array);
-                let getValue = (x) => (2 ** (array[x] / 10 + 9));
-                canvas.beginPath();
-                canvas.moveTo(start * width, height - (getValue(0) - 1) * scale);
-                let count = 256;
-                let step = (end - start) / (count - 1);
-                for (let x = 1; x < count; x++) 
-                {
-                    start += step;
-                    canvas.lineTo(start * width, height - (getValue(x) - 1) * scale);
+                let getValue = (x) => {
+                    let rx = x % 1, num;
+                    if (rx == 0) {
+                        num = array[x];
+                    } else {
+                        let fx = Math.floor(x);
+                        num = array[fx] + (array[fx + 1] - array[fx]) * rx;
+                    }
+                    return 2 ** (num / 10 + 9);
                 }
-                canvas.stroke();
+                let min = Math.min(start, end);
+                let max = Math.max(start, end);
+                for (let a = Math.floor(min * bars.length); a < max * bars.length; a++) {
+                    let pos = (a / bars.length - start) / (end - start);
+                    bars[a] += getValue(count * pos) * strength;
+                }
             }
 
-            drawFrequency(0, 0.5, 0);
-            drawFrequency(1, 0.5, 1);
+            drawFrequency(0, 0.5, 0, 256, 1);
+            drawFrequency(1, 0.5, 1, 256, 1);
+            console.log(bars);
+
+            for (let a = 0; a < bars.length; a++) {
+                let data = this.#data[a];
+                data.value = Math.max(0, Math.min(height, data.value + data.velocity * delta));
+                data.velocity -= 3500 * delta;
+                if (data.value < bars[a]) {
+                    data.velocity = (bars[a] - data.value) / 2 / delta;
+                    data.value = bars[a];
+                }
+            }
+
+            let raw = this.#data.map(a => a.value);
+
+            for (let a = 0; a < bars.length; a++) {
+                this.#data[a].value = (
+                    (raw[a - 3] ?? 0) * 0.5 + 
+                    (raw[a - 2] ?? 0) * 2.5 + 
+                    (raw[a - 1] ?? 0) * 4 + 
+                      raw[a]          * 16 + 
+                    (raw[a + 1] ?? 0) * 4 + 
+                    (raw[a + 2] ?? 0) * 2.5 + 
+                    (raw[a + 3] ?? 0) * 0.5
+                ) / 30;
+            }
+
+
+            console.log(this.#data);
+
+
+            canvas.lineWidth = 2 * scale;
+            canvas.lineJoin = "round";
+
+            canvas.strokeStyle = "#fff";
+            canvas.fillStyle = "#66a7";
+            {
+                let get = (x) => this.#data[x].value;
+                canvas.beginPath();
+                canvas.moveTo(-1, height - (get(0) - 1) * scale);
+                let step = (width + 2) / (bars.length - 1);
+                let pos = -1;
+                for (let x = 1; x < bars.length; x++) 
+                {
+                    pos += step;
+                    canvas.lineTo(pos, height - (get(x) - 1) * scale);
+                }
+                canvas.lineTo(width + 1, height + scale);
+                canvas.lineTo(-1, height + scale);
+                canvas.fill();
+                canvas.stroke();
+            }
         }
     }
       

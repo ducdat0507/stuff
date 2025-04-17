@@ -37,6 +37,7 @@ duducat-music-player .mp_info {
     bottom: auto;
     display: flex;
     gap: 6px;
+    transition: opacity .2s;
 }
 duducat-music-player .mp_play-pause-button {
     position: relative;
@@ -59,6 +60,10 @@ duducat-music-player .mp_play-pause-art:not([src]) {
 duducat-music-player .mp_play-pause-icon {
     background: linear-gradient(#fff3, #fff0);
     box-shadow: inset 0 0 0 2px #fff3;
+}
+duducat-music-player.mp__seeking .mp_info,
+duducat-music-player:not(.mp__initialized) .mp_info {
+    opacity: 0;
 }
 duducat-music-player .mp_info h2 {
     font-size: 1.0em;
@@ -112,27 +117,47 @@ duducat-music-player .mp_progress {
     transition-timing-function: ease-out;
     font-size: .8em;
     position: relative;
+    cursor: grab;
+    pointer-events: none;
 }
-duducat-music-player .mp_progress .mp_info_time {
+duducat-music-player .mp_progress:active {
+    cursor: grabbing;
+}
+duducat-music-player .mp_progress > * {
     position: absolute;
     padding: 2px 6px;
-    bottom: -20px;
+    bottom: 0px;
+    transition: opacity .2s;
+}
+duducat-music-player .mp_info_time {
     left: 0;
-    transition: bottom .3s;
 }
-duducat-music-player .mp_progress .mp_info_duration {
-    position: absolute;
-    padding: 2px 6px;
-    bottom: -20px;
+duducat-music-player .mp_info_duration {
     right: 0;
-    transition: bottom .3s;
 }
-duducat-music-player:is(:hover, :not(.mp__playing)) .mp_progress :is(.mp_info_time, .mp_info_duration) {
-    bottom: 0;
+duducat-music-player.mp__seeking .mp_progress {
+    opacity: 1;
+    transition: opacity .2s, height .2s;
+    text-shadow: 0 0 2px black, 0 0 3px black, 0 0 5px black, 0 0 7px black, 0 0 10px black, 0 0 15px black;
 }
-duducat-music-player:is(:hover, :not(.mp__playing)) .mp_progress {
+duducat-music-player.mp__seeking .mp_info_time {
+    font-size: 1rem;
+    bottom: 50%;
+    left: 50%;
+    transform: translateX(-100%) translateY(50%);
+}
+duducat-music-player.mp__seeking .mp_info_duration {
+    font-size: 1rem;
+    bottom: 50%;
+    right: 50%;
+    transform: translateX(100%) translateY(50%);
+    opacity: .6;
+}
+
+duducat-music-player.mp__initialized:not(.mp__seeking):is(:hover, :not(.mp__playing)) .mp_progress {
     height: calc(100% - 32px);
     opacity: 1;
+    pointer-events: initial;
 }
 duducat-music-player .mp_buttons {
     height: 32px;
