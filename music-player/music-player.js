@@ -195,6 +195,89 @@
         return metadata;
     }
 
+    /** @param {HTMLImageElement} image */
+    function getImageColors(image, count) {
+        let tempCanvas = document.createElement('canvas');
+        let tempCtx = tempCanvas.getContext('2d');
+        tempCanvas.width = image.width;
+        tempCanvas.height = image.height;
+        tempCtx.drawImage(image, 0, 0);
+        let data = tempCtx.getImageData(0, 0, image.width, image.height);
+        let colors = {};
+        for (let a = 0; a < data.data.length; a += 4) 
+        {
+            let id = data.data[a] + ";" + data.data[a+1] + ";" + data.data[a+2];
+            colors[id] ??= 0;
+            colors[id] += data.data[a+3];
+        }
+        let colorKeys = Object.keys(colors)
+
+        let centroids = [...new Array(count)].map(x => colorKeys[Math.floor(Math.random() * colorKeys.length)].split(";"));
+        for (let a = 0; a < 100; a++) {
+            let clusters = [...new Array(count)].map(x => ({}));
+            for (let color in colors) {
+                let val = color.split(";");
+                let distance = centroids.map(x => x.map((n, i) => (n - val[i]) ** 2).reduce((a, b) => a + b));
+                let index = 0;
+                for (let i = 1; i < distance.length; i++) if (distance[i] < distance[index]) index = i;
+                clusters[index][color] ??= 0;
+                clusters[index][color] += colors[color];
+            }
+
+            let converged = true;
+            for (let x = 0; x < clusters.length; x++) {
+                let r = 0, g = 0, b = 0, i = 0;
+                for (let color in clusters[x]) {
+                    let val = color.split(";");
+                    let w = clusters[x][color];
+                    r += val[0] * w;
+                    g += val[1] * w;
+                    b += val[2] * w;
+                    i += w;
+                }
+                if (i <= 0) {
+                    converged = false;
+                    centroids[x][0] += Math.round(Math.random() * 10 - 5);
+                    centroids[x][1] += Math.round(Math.random() * 10 - 5);
+                    centroids[x][2] += Math.round(Math.random() * 10 - 5);
+                    continue;
+                }
+                r = Math.round(r / i);
+                g = Math.round(g / i);
+                b = Math.round(b / i);
+                if (r != centroids[x][0] || g != centroids[x][1] || b != centroids[x][2]) converged = false;
+                centroids[x] = [r, g, b, i];
+            }
+            if (converged) break;
+        }
+        return centroids;
+    }
+
+    function rgbToHsv(r, g, b) {
+        r /= 255, g /= 255, b /= 255;
+    
+        var max = Math.max(r, g, b), min = Math.min(r, g, b);
+        var h, s, v = max;
+    
+        var d = max - min;
+        s = max == 0 ? 0 : d / max;
+    
+        if (max == min) {
+            h = 0; // achromatic
+        } else {
+            switch (max) {
+                case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+                case g: h = (b - r) / d + 2; break;
+                case b: h = (r - g) / d + 4; break;
+            }
+        
+            h /= 6;
+        }
+    
+        return [ h, s, v ];
+    }
+  
+
     class MusicPlayerElement extends HTMLElement {
         #updateHandle = 0;
     
@@ -207,9 +290,14 @@
 
         #time = performance.now();
         #data = [...new Array(512)].map(_ => ({
-            value: 0,
-            velocity: 0
+            x1: 0,
+            v1: 0,
+            x2: 0,
+            v2: 0,
         }));
+
+        #primary = "#66a7";
+        #secondary = "#0007";
     
         constructor() {
           super();
@@ -312,7 +400,7 @@
             }
 
             if (!this.#updateHandle) {
-                this.#updateHandle = requestAnimationFrame(() => this.$update());
+                this.#updateHandle = requestAnimationFrame(() => this.#update());
             }
         }
 
@@ -322,6 +410,8 @@
             this.#elms.infoTitle.textContent = file.name;
             this.#elms.infoArtist.textContent = this.#elms.infoAlbum.textContent = "";
             this.#elms.playPauseArt.removeAttribute("src");
+            this.#primary = "#66a7";
+            this.#secondary = "#0007";
             if (this.#elms.background) {
                 let bg = this.#elms.background;
                 bg.style.setProperty("--mp__progress", this.style.getPropertyValue("--mp__progress"));
@@ -337,6 +427,26 @@
                     let background = document.createElement("img");
                     background.src = this.#elms.playPauseArt.src = data.info.mainPicture.image;
                     this.#elms.backgrounds.append(this.#elms.background = background);
+                    this.#elms.playPauseArt.onload = () => {
+                        let colors = getImageColors(this.#elms.playPauseArt, 5).filter(x => x[3]).map(c => {
+                            let col = {
+                                weight: c[3],
+                                rgb: [c[0], c[1], c[2]],
+                                hsv: rgbToHsv(...c),
+                                luma: 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2]
+                            }
+                            col.primaryScore = col.hsv[1] * (1 - Math.abs(col.luma / 128 - 1));
+                            return col;
+                        })
+                        colors.sort((a, b) => b.weight - a.weight);
+                        this.#secondary = `rgba(${colors[0].rgb[0]}, ${colors[0].rgb[1]}, ${colors[0].rgb[2]})`;
+                        let secondary = colors.shift();
+                        colors.forEach((x) => x.primaryScore *= Math.abs(x.luma - secondary.luma));
+                        colors.sort((a, b) => b.primaryScore - a.primaryScore);
+                        this.#primary = `rgba(${colors[0].rgb[0]}, ${colors[0].rgb[1]}, ${colors[0].rgb[2]}, 127)`;
+                        console.log(secondary, colors)
+                    
+                    }
                 });
             }).catch(console.log);
 
@@ -394,12 +504,12 @@
             cancelAnimationFrame(this.#updateHandle);
         }
     
-        $update() {
+        #update() {
             let delta = performance.now() - this.#time;
             this.#time += delta;
             delta /= 1000;
 
-            this.#updateHandle = requestAnimationFrame(() => this.$update());
+            this.#updateHandle = requestAnimationFrame(() => this.#update());
             let scale = window.devicePixelRatio ?? 1;
             let width = this.#elms.canvas.width = this.#elms.canvas.clientWidth * scale;
             let height = this.#elms.canvas.height = this.#elms.canvas.clientHeight * scale;
@@ -412,63 +522,87 @@
                 if (!analyser) return;
                 let array = new Float32Array(analyser.frequencyBinCount);
                 analyser.getFloatFrequencyData(array);
+                let smooth = (x) => x;
                 let getValue = (x) => {
                     let rx = x % 1, num;
                     if (rx == 0) {
                         num = array[x];
                     } else {
                         let fx = Math.floor(x);
-                        num = array[fx] + (array[fx + 1] - array[fx]) * rx;
+                        num = array[fx] + (array[fx + 1] - array[fx]) * smooth(rx);
                     }
                     return 2 ** (num / 10 + 9);
                 }
                 let min = Math.min(start, end);
                 let max = Math.max(start, end);
+                let offset = Math.sign(end - start);
                 for (let a = Math.floor(min * bars.length); a < max * bars.length; a++) {
-                    let pos = (a / bars.length - start) / (end - start);
-                    bars[a] += getValue(count * pos) * strength;
+                    let pos = count ** ((a / bars.length - start + offset * 0.3) / (end - start + offset * 0.3)) - count ** 0.3;
+                    bars[a] += getValue(pos) * strength;
                 }
             }
 
-            drawFrequency(0, 0.5, 0, 256, 1);
-            drawFrequency(1, 0.5, 1, 256, 1);
-            console.log(bars);
+            drawFrequency(0, 0.5, 0, 1024, 1);
+            drawFrequency(1, 0.5, 1, 1024, 1);
 
             for (let a = 0; a < bars.length; a++) {
                 let data = this.#data[a];
-                data.value = Math.max(0, Math.min(height, data.value + data.velocity * delta));
-                data.velocity -= 3500 * delta;
-                if (data.value < bars[a]) {
-                    data.velocity = (bars[a] - data.value) / 2 / delta;
-                    data.value = bars[a];
+                data.x1 += data.v1 * delta;
+                data.v1 = Math.min(height, data.v1 - 3500 * delta);
+                if (data.x1 < 0) {
+                    data.v1 = data.x1 = 0;
+                } else if (data.x1 < bars[a]) {
+                    data.v1 = (bars[a] - data.x1) / 2 / delta;
+                    data.x1 = bars[a];
+                }
+
+                data.x2 += data.v2 * delta;
+                data.v2 = Math.min(height, data.v2 - 500 * delta);
+                if (data.x2 < data.x1) {
+                    data.x2 = data.x1;
+                    data.v2 = data.v1 / 2;
                 }
             }
 
-            let raw = this.#data.map(a => a.value);
+            let raw = this.#data.map(a => a.x1);
 
             for (let a = 0; a < bars.length; a++) {
-                this.#data[a].value = (
+                this.#data[a].x1 = (
                     (raw[a - 3] ?? 0) * 0.5 + 
                     (raw[a - 2] ?? 0) * 2.5 + 
                     (raw[a - 1] ?? 0) * 4 + 
-                      raw[a]          * 16 + 
+                      raw[a]          * 136 + 
                     (raw[a + 1] ?? 0) * 4 + 
                     (raw[a + 2] ?? 0) * 2.5 + 
                     (raw[a + 3] ?? 0) * 0.5
-                ) / 30;
+                ) / 150;
             }
-
-
-            console.log(this.#data);
-
 
             canvas.lineWidth = 2 * scale;
             canvas.lineJoin = "round";
 
-            canvas.strokeStyle = "#fff";
-            canvas.fillStyle = "#66a7";
+            canvas.fillStyle = canvas.strokeStyle = this.#secondary;
             {
-                let get = (x) => this.#data[x].value;
+                let get = (x) => this.#data[x].x2;
+                canvas.beginPath();
+                canvas.moveTo(-1, height - (get(0) - 1) * scale);
+                let step = (width + 2) / (bars.length - 1);
+                let pos = -1;
+                for (let x = 1; x < bars.length; x++) 
+                {
+                    pos += step;
+                    canvas.lineTo(pos, height - (get(x) - 1) * scale);
+                }
+                canvas.lineTo(width + 1, height + scale);
+                canvas.lineTo(-1, height + scale);
+                canvas.fill();
+                canvas.stroke();
+            }
+
+            canvas.strokeStyle = "#fff";
+            canvas.fillStyle = this.#primary;
+            {
+                let get = (x) => this.#data[x].x1;
                 canvas.beginPath();
                 canvas.moveTo(-1, height - (get(0) - 1) * scale);
                 let step = (width + 2) / (bars.length - 1);
