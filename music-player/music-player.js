@@ -326,10 +326,10 @@
                                 <div class="mp_play-pause-icon"></div>
                             </button>
                         </div>
-                        <div>
-                            <h2><span class="mp_info_title"></span></h2>
-                            <p><span class="mp_info_artist"></span></p>
-                            <p><span class="mp_info_album"></span></p>
+                        <div class="mp_info_holder">
+                            <h2 class="mp_info_title"></h2>
+                            <p class="mp_info_artist"></p>
+                            <p class="mp_info_album"></p>
                         </div>
                     </section>
                 `
@@ -410,8 +410,8 @@
             this.#elms.infoTitle.textContent = file.name;
             this.#elms.infoArtist.textContent = this.#elms.infoAlbum.textContent = "";
             this.#elms.playPauseArt.removeAttribute("src");
-            this.#primary = "#66a7";
-            this.#secondary = "#0007";
+            this.#primary = "#77c";
+            this.#secondary = "#44a";
             if (this.#elms.background) {
                 let bg = this.#elms.background;
                 bg.style.setProperty("--mp__progress", this.style.getPropertyValue("--mp__progress"));
@@ -435,7 +435,7 @@
                                 hsv: rgbToHsv(...c),
                                 luma: 0.2126*c[0] + 0.7152*c[1] + 0.0722*c[2]
                             }
-                            col.primaryScore = col.hsv[1] * (1 - Math.abs(col.luma / 128 - 1));
+                            col.primaryScore = col.hsv[1] * (1 - Math.abs(col.luma / 128 - 1) ** 2);
                             return col;
                         })
                         colors.sort((a, b) => b.weight - a.weight);
@@ -537,7 +537,7 @@
                 let max = Math.max(start, end);
                 let offset = Math.sign(end - start);
                 for (let a = Math.floor(min * bars.length); a < max * bars.length; a++) {
-                    let pos = count ** ((a / bars.length - start + offset * 0.3) / (end - start + offset * 0.3)) - count ** 0.3;
+                    let pos = count ** ((a / bars.length - start + offset * 0.2) / (end - start + offset * 0.2)) - count ** 0.2;
                     bars[a] += getValue(pos) * strength;
                 }
             }
@@ -548,7 +548,7 @@
             for (let a = 0; a < bars.length; a++) {
                 let data = this.#data[a];
                 data.x1 += data.v1 * delta;
-                data.v1 = Math.min(height, data.v1 - 3500 * delta);
+                data.v1 = Math.min(height, data.v1 - 5000 * delta);
                 if (data.x1 < 0) {
                     data.v1 = data.x1 = 0;
                 } else if (data.x1 < bars[a]) {
@@ -571,11 +571,11 @@
                     (raw[a - 3] ?? 0) * 0.5 + 
                     (raw[a - 2] ?? 0) * 2.5 + 
                     (raw[a - 1] ?? 0) * 4 + 
-                      raw[a]          * 136 + 
+                      raw[a]          * 26 + 
                     (raw[a + 1] ?? 0) * 4 + 
                     (raw[a + 2] ?? 0) * 2.5 + 
                     (raw[a + 3] ?? 0) * 0.5
-                ) / 150;
+                ) / 40;
             }
 
             canvas.lineWidth = 2 * scale;
