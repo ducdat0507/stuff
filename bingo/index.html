@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+            * {
+                box-sizing: border-box;
+                font-family: "Helvetica", "FreeSans", "Arial", sans-serif
+            }
+            body {
+                color: white;
+                background: black;
+                font-family: Arial, sans-serif;
+            }
+            #main-container {
+                position: fixed;
+                inset: 0;
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                justify-content: center;
+            }
+            #main-container > .view {
+                width: 40em;
+                max-width: 100%;
+                padding: 1em;
+            }
+            #main-table {
+                text-align: center;
+                display: flex;
+                flex-flow: column;
+            }
+            #main-table caption {
+                font-size: 2em;
+                font-weight: bold;
+                margin-bottom: 0.5em;
+            }
+            #main-table tbody {
+                display: flex;
+                flex-flow: column;
+                border: 2px outset white;
+            }
+            #main-table tbody tr {
+                display: flex;
+                flex-flow: row;
+            }
+            #main-table tbody td {
+                position: relative;
+                aspect-ratio: 1;
+                flex: 1 1 0px;
+                border: 2px inset white;
+            }
+            #main-table tbody td > input {
+                display: none;
+            }
+            #main-table tbody td > label {
+                position: absolute;
+                inset: 0;
+                display: flex;
+                flex-flow: column;
+                align-items: center;
+                justify-content: center;
+                padding: 1em;
+                cursor: pointer;
+                user-select: none;
+                overflow: hidden;
+            }
+            #main-table tbody td > :checked + label {
+                background: #afa;
+                color: black;
+            }
+            #main-table tbody img {
+                max-width: 100%;
+            }
+
+            .underline {
+                text-decoration: underline;
+            }
+        </style>
+        <script src="main.js"></script>
+        <base target="_blank">
+    </head>
+    <body>
+        <div id="main-container">
+            <div class="view">
+                <table id="main-table"></ta>
+            </div>
+        </div>
+    </body>
+</html>
