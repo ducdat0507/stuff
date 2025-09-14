@@ -79,6 +79,10 @@ function promptSeed(id) {
     document.getElementById("bingo-name").innerText = document.title = bingoBoards[id].name;
     document.getElementById("seed-prompt-question").innerText = bingoBoards[id].seedPrompt ?? "Seed:";
     document.getElementById("seed-prompt-input").placeholder = bingoBoards[id].seedPlaceholder;
+
+    document.getElementById("seed-prompt-play").onclick = () => {
+        populateBingo(id, document.getElementById("seed-prompt-input").value);
+    }
 }
 
 function populateBingo(id, seed) {
@@ -150,9 +154,6 @@ function correctSize(items) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("seed-prompt-play").onclick = () => {
-        populateBingo(board, document.getElementById("seed-prompt-input").value);
-    }
 
     let list = document.getElementById("bingo-list");
     for (let board in bingoBoards) {
