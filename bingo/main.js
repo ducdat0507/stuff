@@ -5,14 +5,15 @@ let bingoBoards = {
         seedPrompt: "Your website's domain:",
         seedPlaceholder: "duducat.moe",
         items: [
+            "Webmaster is under age of majority",
             `Public hit counter (you're visitor #)`,
             "<marquee>Marquee</marquee>",
             "\"Site is under construction\" banner",
-            "Comment section that uses a Google Sheet on Google Drive as a database",
+            "Comment script that uses a Google Sheet on Google Drive as the database",
             "Manifesto/About me page expressing dissatisfaction for social media",
             `Website virtual pets<br><img src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi!">`,
-            "Auto-playing music that actually doesn't work on common browsers",
-            "In more than 10 different webrings",
+            "Tries to auto-play music but fails because competent browsers block it",
+            "Joined more than five different webrings",
             "Guestbook",
             "Abysmal text-to-background color contrast",
             "Visitor poll widget",
@@ -21,33 +22,48 @@ let bingoBoards = {
             "Status widget",
             "Music player widget",
             "Mood tracker widget",
-            "Already on version 10+",
+            "Already on the fourth iteration (or higher)",
             "Puts main content inside an <code>iframe</code>",
             "Landing page with hard-to-find enter link",
             "Neko script (cat-follows-mouse)",
-        ],
-        priorityItems: [
+            "Broken or placeholder links on site nav",
+            "Webmaster has 20+ different interests",
+            "Every page uses a different layout",
+            "DNI list",
+            "Shows public hatred towards JavaScript",
+            "Has pixel art graphics scattered everywhere",
+            
+            [
+                `"Copying is an act of love, please copy" under site footer`,
+                `"Copying is an act of hate" under site footer`,
+            ],
             [
                 `This graphic: <img src="assets/indieweb/images/phonechump.gif" alt="Don't be a phone chump - Get a computer NOW">`,
             ],
+        ],
+        priorityItems: [
             [
                 "Dedicated page for 88x31 buttons",
                 "Dedicated page for outside links",
-                "Dedicated page for blinkies",
+                "Dedicated page for blinkies and stamps",
+                "Dedicated page for web graphics ripped from the internet",
             ],
             [
                 "Cyberpunk design",
+                "Gothic design",
                 `"Frutiger Aero" design`,
                 "Bright pastel colors",
             ],
             [
                 "Uses a layout generator",
                 `"Bento" layout`,
+                `"Fake operating system" layout`,
+                "Layout uses hardcoded absolute position",
             ],
             [
-                "Star background",
+                "Retro space background",
                 "Sky background",
-                "Checkerboard background"
+                "Checkerboard background",
             ]
         ],
         centerItem: [
