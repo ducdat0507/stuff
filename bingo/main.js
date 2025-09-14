@@ -1,14 +1,16 @@
 
-let bingoCards = {
+let bingoBoards = {
     indieweb: {
         name: "Indie Web Site Bingo",
+        seedPrompt: "Your website's domain:",
+        seedPlaceholder: "duducat.moe",
         items: [
             `Public hit counter (you're visitor #)`,
             "<marquee>Marquee</marquee>",
             "\"Site is under construction\" banner",
             "Comment section that uses a Google Sheet on Google Drive as a database",
             "Manifesto/About me page expressing dissatisfaction for social media",
-            `Website virtual pets<br><a href="https://tamanotchi.world/25353c"><img src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi! Click to feed!"></a>`,
+            `Website virtual pets<br><img src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi!">`,
             "Auto-playing music that actually doesn't work on common browsers",
             "In more than 10 different webrings",
             "Guestbook",
@@ -49,46 +51,77 @@ let bingoCards = {
             ]
         ],
         centerItem: [
-            "Hosted on Neocities", 
-            "Hosted on Nekoweb", 
+            "Hosted on Neocities",
+            "Hosted on Nekoweb",
             "Hosted on GitHub Pages"
         ],
     }
 }
 
-function populateBingo(id) {
-    let table = document.getElementById("main-table");
-    table.innerHTML = `<caption>${bingoCards[id].name}</caption>`
+function setListVisible(visible) {
+    document.getElementById("begin-view").style.display = visible ? "" : "none";
+    document.getElementById("game-view").style.display = visible ? "none" : "";
+}
 
-    let items = [...bingoCards[id].items];
-    let priorityItems = [...bingoCards[id].priorityItems];
+function setSeedPromptVisibility(visible) {
+    document.getElementById("bingo-info").classList.toggle("info-hidden", visible);
+    document.getElementById("main-table").style.visibility = visible ? "hidden" : "";
+    document.getElementById("seed-prompt").style.display = visible ? "" : "none";
+}
+
+function showBoardList() {
+    setListVisible(true);
+}
+
+function promptSeed(id) {
+    setSeedPromptVisibility(true);
+    setListVisible(false);
+    document.getElementById("bingo-name").innerText = document.title = bingoBoards[id].name;
+    document.getElementById("seed-prompt-question").innerText = bingoBoards[id].seedPrompt ?? "Seed:";
+    document.getElementById("seed-prompt-input").placeholder = bingoBoards[id].seedPlaceholder;
+}
+
+function populateBingo(id, seed) {
+    let table = document.getElementById("main-table");
+    document.getElementById("bingo-name").innerText = document.title = bingoBoards[id].name;
+    setSeedPromptVisibility(false);
+    setListVisible(false);
+
+    seed ||= 
+        Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0)
+        + Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0);
+    let random = seededRandom(stringHash(seed));
+    document.getElementById("bingo-seed").innerHTML = `${seed}`
+
+    let items = [...bingoBoards[id].items];
+    let priorityItems = [...bingoBoards[id].priorityItems];
     let pool = [...(priorityItems ?? items)];
     let size = Math.min(Math.floor(Math.sqrt(items.length + (priorityItems?.length ?? 0))), 5);
     let centerPos = NaN;
-    if (bingoCards[id].centerItem) {
+    if (bingoBoards[id].centerItem) {
         size = Math.floor((size - 1) / 2)
         centerPos = size;
         size = size * 2 + 1;
     }
     let bodyHTML = "";
 
-    
+
     while (pool.length < size * size - (centerPos ? 1 : 0)) {
-        let itemId = Math.floor(Math.random() * items.length);
+        let itemId = Math.floor(random() * items.length);
         pool.push(items[itemId]);
         items.splice(itemId, 1);
     }
-    
+
     let index = 0;
     bodyHTML += "<tbody>"
     for (let row = 0; row < size; row++) {
         bodyHTML += "<tr>"
         for (let col = 0; col < size; col++) {
-            let itemId = Math.floor(Math.random() * pool.length);
+            let itemId = Math.floor(random() * pool.length);
             let item = pool[itemId];
             let isCenter = row == centerPos && col == centerPos;
-            if (isCenter) item = bingoCards[id].centerItem;
-            if (Array.isArray(item)) item = item[Math.floor(Math.random() * item.length)];
+            if (isCenter) item = bingoBoards[id].centerItem;
+            if (Array.isArray(item)) item = item[Math.floor(random() * item.length)];
             bodyHTML += `<td>
                 <input type="checkbox" id="bingo-check-${index}">
                 <label for="bingo-check-${index}"><span>${item}</span></label>
@@ -100,7 +133,7 @@ function populateBingo(id) {
     }
     bodyHTML += "</tbody>"
 
-    table.innerHTML += bodyHTML;
+    table.innerHTML = bodyHTML;
 
     correctSize(document.querySelectorAll("#main-table td label"));
 }
@@ -117,7 +150,33 @@ function correctSize(items) {
 }
 
 window.addEventListener("DOMContentLoaded", () => {
-    populateBingo("indieweb");
+    document.getElementById("seed-prompt-play").onclick = () => {
+        populateBingo(board, document.getElementById("seed-prompt-input").value);
+    }
+
+    let list = document.getElementById("bingo-list");
+    for (let board in bingoBoards) {
+        let a = document.createElement("a");
+        a.href = "?board=" + board;
+        a.classList.add("button");
+        a.innerText = bingoBoards[board].name;
+        a.onclick = (e) => {
+            e.preventDefault();
+            if (bingoBoards[board].skipSeedPrompt) populateBingo(board);
+            else promptSeed(board);
+        }
+        list.append(a);
+    }
+
+    let board = new URLSearchParams(document.location.search).get("board");
+    let seed = new URLSearchParams(document.location.search).get("seed");
+    if (board && bingoBoards[board]) {
+        if (seed) populateBingo(board, seed);
+        else if (bingoBoards[board].skipSeedPrompt) populateBingo(board);
+        else promptSeed(board);
+    } else {
+        showBoardList();
+    }
 })
 
 window.addEventListener("resize", () => {
