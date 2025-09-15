@@ -1,6 +1,6 @@
 
 let bingoBoards = {
-    indieweb: {
+    "indie-web": {
         name: "Indie Web Site Bingo",
         seedPrompt: "Your website's domain:",
         seedPlaceholder: "duducat.moe",
@@ -8,7 +8,7 @@ let bingoBoards = {
             "Webmaster is under age of majority",
             `Public hit counter (you're visitor #)`,
             "<marquee>Marquee</marquee>",
-            "\"Site is under construction\" banner",
+            `"Site is under construction" banner`,
             "Comment script that uses a Google Sheet on Google Drive as the database",
             "Manifesto/About me page expressing dissatisfaction for social media",
             `Website virtual pets<br><img src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi!">`,
@@ -71,7 +71,42 @@ let bingoBoards = {
             "Hosted on Nekoweb",
             "Hosted on GitHub Pages"
         ],
-    }
+    },
+    // "mobile-idle": {
+    //     name: "Mobile Idle Game Bingo",
+    //     seedPrompt: "Game name:",
+    //     seedPlaceholder: "One Trillion Free Draws",
+    //     items: [
+    //         {
+    //             "base": "Gacha system",
+    //             "gold": "Run ads that promises 1,000+ gacha pulls",
+    //         },
+    //         {
+    //             "base": "Daily mission system",
+    //             "gold": `"Watch ads" daily mission`,
+    //         },
+    //         {
+    //             "base": "Clan system",
+    //         },
+    //         {
+    //             "base": "Requires online connection to boot up",
+    //             "base": "...and is single player",
+    //         },
+    //         {
+    //             "base": "Advertises gift codes",
+    //             "gold": `Gift code has at least a run of 3 repeating digits`,
+    //         },
+    //         {
+    //             "base": "Has a leaderboard",
+    //             "gold": `Has 10 different leaderboards`,
+    //         },
+    //     ],
+    //     centerItem: "Is free to play",
+    // }
+}
+
+let bingoAliases = {
+    "indieweb": "indie-web"
 }
 
 function setListVisible(visible) {
@@ -89,15 +124,17 @@ function showBoardList() {
     setListVisible(true);
 }
 
-function promptSeed(id) {
+function promptSeed(board) {
     setSeedPromptVisibility(true);
     setListVisible(false);
-    document.getElementById("bingo-name").innerText = document.title = bingoBoards[id].name;
-    document.getElementById("seed-prompt-question").innerText = bingoBoards[id].seedPrompt ?? "Seed:";
-    document.getElementById("seed-prompt-input").placeholder = bingoBoards[id].seedPlaceholder;
+    document.getElementById("bingo-name").innerText = document.title = bingoBoards[board].name;
+    document.getElementById("seed-prompt-question").innerText = bingoBoards[board].seedPrompt ?? "Seed:";
+    document.getElementById("seed-prompt-input").placeholder = bingoBoards[board].seedPlaceholder;
 
     document.getElementById("seed-prompt-play").onclick = () => {
-        populateBingo(id, document.getElementById("seed-prompt-input").value);
+        let seed = document.getElementById("seed-prompt-input").value || getRandomSeed();
+        populateBingo(board, seed);
+        history.pushState({}, "", `?board=${board}&seed=${seed}`);
     }
 }
 
@@ -107,14 +144,12 @@ function populateBingo(id, seed) {
     setSeedPromptVisibility(false);
     setListVisible(false);
 
-    seed ||= 
-        Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0)
-        + Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0);
+    seed ||= getRandomSeed();
     let random = seededRandom(stringHash(seed));
     document.getElementById("bingo-seed").innerHTML = `${seed}`
 
-    let items = [...bingoBoards[id].items];
-    let priorityItems = [...bingoBoards[id].priorityItems];
+    let items = [...(bingoBoards[id].items ?? [])];
+    let priorityItems = [...(bingoBoards[id].priorityItems ?? [])];
     let pool = [...(priorityItems ?? items)];
     let size = Math.min(Math.floor(Math.sqrt(items.length + (priorityItems?.length ?? 0))), 5);
     let centerPos = NaN;
@@ -158,6 +193,11 @@ function populateBingo(id, seed) {
     correctSize(document.querySelectorAll("#main-table td label"));
 }
 
+function getRandomSeed() {
+    return Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0)
+        + Math.floor(Math.random() * 4294967296).toString(16).padStart(8, 0);
+}
+
 function correctSize(items) {
     for (let item of items) {
         let size = 1;
@@ -169,8 +209,26 @@ function correctSize(items) {
     }
 }
 
+function updateUrlState() {
+    // Check board and seed from url
+    let board = new URLSearchParams(document.location.search).get("board");
+    let seed = new URLSearchParams(document.location.search).get("seed");
+
+    if (board && bingoAliases[board]) {
+        board = bingoAliases[board];
+    }
+    if (board && bingoBoards[board]) {
+        if (seed) populateBingo(board, seed);
+        else if (bingoBoards[board].skipSeedPrompt) populateBingo(board);
+        else promptSeed(board);
+    } else {
+        showBoardList();
+    }
+}
+
 window.addEventListener("DOMContentLoaded", () => {
 
+    // Initialize bingo list
     let list = document.getElementById("bingo-list");
     for (let board in bingoBoards) {
         let a = document.createElement("a");
@@ -181,19 +239,16 @@ window.addEventListener("DOMContentLoaded", () => {
             e.preventDefault();
             if (bingoBoards[board].skipSeedPrompt) populateBingo(board);
             else promptSeed(board);
+            history.pushState({}, "", "?board=" + board);
         }
         list.append(a);
     }
 
-    let board = new URLSearchParams(document.location.search).get("board");
-    let seed = new URLSearchParams(document.location.search).get("seed");
-    if (board && bingoBoards[board]) {
-        if (seed) populateBingo(board, seed);
-        else if (bingoBoards[board].skipSeedPrompt) populateBingo(board);
-        else promptSeed(board);
-    } else {
-        showBoardList();
-    }
+    updateUrlState();
+})
+
+window.addEventListener("popstate", () => {
+    updateUrlState();
 })
 
 window.addEventListener("resize", () => {
