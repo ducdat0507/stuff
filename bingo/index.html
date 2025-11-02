@@ -126,12 +126,28 @@
                 background: #afa;
                 color: black;
             }
+            #main-table tbody td > input:not(:checked) + label + input:not(:checked) + label {
+                display: none;
+            } 
+            #main-table tbody td > input:checked + label + input + label {
+                background: #afa;
+                color: black;
+            } 
+            #main-table tbody td > input:not(:checked) + label + :checked + label {
+                background: #ffa;
+            } 
             #main-table tbody td > :checked + label:hover {
                 background: #dfd;
             }
             #main-table tbody img {
                 max-width: 100%;
             }
+            #main-table tbody td > input + label + input:not(:checked) + label + input + label {
+                display: none;
+            } 
+            #main-table tbody td > input + label + :checked + label + input + label {
+                background: none;
+            } 
             #seed-prompt {
                 position: absolute;
                 display: flex;

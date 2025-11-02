@@ -11,7 +11,7 @@ let bingoBoards = {
             `"Site is under construction" banner`,
             "Comment script that uses a Google Sheet on Google Drive as the database",
             "Manifesto/About me page expressing dissatisfaction for social media",
-            `Website virtual pets<br><img src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi!">`,
+            `Website virtual pets<br><img style="margin-top:0.5em" src="https://tamanotchi.world/i/25353" alt="It's tamaNOTchi!">`,
             "Tries to auto-play music but fails because competent browsers block it",
             "Joined more than five different webrings",
             "Guestbook",
@@ -38,7 +38,7 @@ let bingoBoards = {
                 `"Copying is an act of hate" under site footer`,
             ],
             [
-                `This graphic: <img src="assets/indieweb/images/phonechump.gif" alt="Don't be a phone chump - Get a computer NOW">`,
+                `This graphic: <img style="margin-top:0.5em" src="bingo-assets/indie-web/phonechump.gif" alt="Don't be a phone chump - Get a computer NOW">`,
             ],
         ],
         priorityItems: [
@@ -72,37 +72,88 @@ let bingoBoards = {
             "Hosted on GitHub Pages"
         ],
     },
-    // "mobile-idle": {
-    //     name: "Mobile Idle Game Bingo",
-    //     seedPrompt: "Game name:",
-    //     seedPlaceholder: "One Trillion Free Draws",
-    //     items: [
-    //         {
-    //             "base": "Gacha system",
-    //             "gold": "Run ads that promises 1,000+ gacha pulls",
-    //         },
-    //         {
-    //             "base": "Daily mission system",
-    //             "gold": `"Watch ads" daily mission`,
-    //         },
-    //         {
-    //             "base": "Clan system",
-    //         },
-    //         {
-    //             "base": "Requires online connection to boot up",
-    //             "base": "...and is single player",
-    //         },
-    //         {
-    //             "base": "Advertises gift codes",
-    //             "gold": `Gift code has at least a run of 3 repeating digits`,
-    //         },
-    //         {
-    //             "base": "Has a leaderboard",
-    //             "gold": `Has 10 different leaderboards`,
-    //         },
-    //     ],
-    //     centerItem: "Is free to play",
-    // }
+    "mobile-idle-rpg": {
+        name: "Mobile Idle RPG Bingo",
+        seedPrompt: "Game name:",
+        seedPlaceholder: "One Trillion Free Draws",
+        items: [
+            "Offers less than 10 hours of offline progress",
+            "Clan system where the guild owners ban you if you miss playing for a day",
+            "Monetizes quality-of-life features",
+            "Images have clearly visible gen-AI artifacts",
+            "Passive income is measured in units/hour or day",
+            "Letter notation (1000 = 1a)",
+            "Game title on store page is a word soup",
+            "Players are compared by their One Number&trade;",
+            "Dungeon system with daily limited entries",
+            "Medieval fantasy setting",
+            `Elemental system which goes like: <img style="margin-top:0.5em" src="bingo-assets/mobile-idle-rpg/elemental.svg" alt="Red &rarr; Green &rarr; Blue &rarr; Red, Light &lrarr; Dark">`,
+        ],
+        priorityItems: [
+            {
+                "base": "Battle pass system",
+                "extra": "The battle pass list is scrollable",
+            },
+            {
+                "base": "Show IAP popups when you open the game",
+                "extra": "The game makes you wait to dismiss them",
+            },
+            {
+                "base": "Gacha system",
+                "extra": "Run ads that promises 1,000+ gacha pulls",
+            },
+            {
+                "base": "Daily mission system",
+                "extra": `One of the missions is "Watch ads"`,
+            },
+            {
+                "base": "Requires online connection to boot up",
+                "extra": "And has no multiplayer features",
+            },
+            {
+                "base": "Gift codes are one of the selling points of the game",
+                "extra": `One of them include a 3 repeating digit sequence`,
+            },
+            {
+                "base": "Leaderboard full of whales on top spots",
+                "extra": "At least 5 of the game's mechanics have their own leaderboards",
+            },
+            {
+                "base": `"PvP" arena system where the rival "player" is computer-controlled`,
+                "extra": `Have fake profiles to fill arena spots`,
+            },
+            {
+                "base": "In-game chat",
+                "extra": `The word "ice" is censored`,
+            },
+            {
+                "base": "Encourages you to leave the game open 24/7",
+                "extra": "Detects and bans emulator/computer play",
+            },
+            {
+                "base": "Separates players into servers",
+                "extra": "Servers eventually get merged",
+            },
+            {
+                "base": "Active skill system",
+                "extra": "You need to gacha for skills",
+            },
+            {
+                "base": "Random text in different language",
+                "extra": "The language is Korean",
+            },
+            {
+                "base": "Daily/weekly performance rewards",
+                "extra": "Rewards are delivered by in-game mail",
+            },
+            {
+                "base": "Has a Discord server",
+                "extra": "Which is under-moderated",
+            },
+        ],
+        priorityLimit: 15,
+        centerItem: "Is free to play",
+    }
 }
 
 let bingoAliases = {
@@ -122,6 +173,7 @@ function setSeedPromptVisibility(visible) {
 
 function showBoardList() {
     setListVisible(true);
+    document.title = "duducat's bingo boards";
 }
 
 function promptSeed(board) {
@@ -139,8 +191,10 @@ function promptSeed(board) {
 }
 
 function populateBingo(id, seed) {
+    let data = bingoBoards[id];
+
     let table = document.getElementById("main-table");
-    document.getElementById("bingo-name").innerText = document.title = bingoBoards[id].name;
+    document.getElementById("bingo-name").innerText = document.title = data.name;
     setSeedPromptVisibility(false);
     setListVisible(false);
 
@@ -148,19 +202,24 @@ function populateBingo(id, seed) {
     let random = seededRandom(stringHash(seed));
     document.getElementById("bingo-seed").innerHTML = `${seed}`
 
-    let items = [...(bingoBoards[id].items ?? [])];
-    let priorityItems = [...(bingoBoards[id].priorityItems ?? [])];
+    let items = [...(data.items ?? [])];
+    let priorityItems = [...(data.priorityItems ?? [])];
     let pool = [...(priorityItems ?? items)];
-    let size = Math.min(Math.floor(Math.sqrt(items.length + (priorityItems?.length ?? 0))), 5);
+    let itemCount = items.length + (data.priorityLimit ?? priorityItems?.length ?? 0)
+    if (data.centerItem) itemCount++;
+    let size = Math.min(Math.floor(Math.sqrt(itemCount)), 5);
     let centerPos = NaN;
-    if (bingoBoards[id].centerItem) {
+    if (data.centerItem) {
         size = Math.floor((size - 1) / 2)
         centerPos = size;
         size = size * 2 + 1;
     }
     let bodyHTML = "";
 
-
+    if (priorityItems && data.priorityLimit) while (pool.length > data.priorityLimit) {
+        let itemId = Math.floor(random() * pool.length);
+        pool.splice(itemId, 1);
+    }
     while (pool.length < size * size - (centerPos ? 1 : 0)) {
         let itemId = Math.floor(random() * items.length);
         pool.push(items[itemId]);
@@ -175,12 +234,25 @@ function populateBingo(id, seed) {
             let itemId = Math.floor(random() * pool.length);
             let item = pool[itemId];
             let isCenter = row == centerPos && col == centerPos;
-            if (isCenter) item = bingoBoards[id].centerItem;
+            if (isCenter) item = data.centerItem;
             if (Array.isArray(item)) item = item[Math.floor(random() * item.length)];
-            bodyHTML += `<td>
-                <input type="checkbox" id="bingo-check-${index}">
-                <label for="bingo-check-${index}"><span>${item}</span></label>
-            </td>`
+
+            if (typeof item == "object") {
+                bodyHTML += `<td>
+                    <input type="radio" name="bingo-check-${index}" id="bingo-check-${index}">
+                    <label for="bingo-check-${index}"><span>${item.base}</span></label>
+                    <input class="extra" type="radio" name="bingo-check-${index}" id="bingo-check-2-${index}">
+                    <label class="extra" for="bingo-check-2-${index}"><span>${item.extra}</span></label>
+                    <input class="invis" type="radio" name="bingo-check-${index}" id="bingo-check-3-${index}" checked>
+                    <label class="invis" for="bingo-check-3-${index}"></label>
+                </td>`
+            } else {
+                bodyHTML += `<td>
+                    <input type="checkbox" id="bingo-check-${index}">
+                    <label for="bingo-check-${index}"><span>${item}</span></label>
+                </td>`
+            }
+
             if (!isCenter) pool.splice(itemId, 1);
             index++;
         }
@@ -189,6 +261,10 @@ function populateBingo(id, seed) {
     bodyHTML += "</tbody>"
 
     table.innerHTML = bodyHTML;
+    table.querySelectorAll("img").forEach(img => {
+        img.onload = () => correctSize(document.querySelectorAll("#main-table td label"));
+        img.onerror = () => correctSize(document.querySelectorAll("#main-table td label"));
+    })
 
     correctSize(document.querySelectorAll("#main-table td label"));
 }
