@@ -32,7 +32,7 @@ let bingoBoards = {
             "DNI list",
             "Shows public hatred towards JavaScript",
             "Has pixel art graphics scattered everywhere",
-            "Recommends W3Schools",
+            "Recommends W3Schools as a reputable resource site",
             
             [
                 `"Copying is an act of love, please copy" under site footer`,
