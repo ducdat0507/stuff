@@ -1,0 +1,18 @@
+{
+    "short_name": "blarbmaker",
+    "name": "the blarbmaker",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "res/favicon.png",
+        "sizes": "256x256",
+        "type": "image/png"
+      }
+    ],
+    "start_url": ".",
+    "id": ".",
+    "scope": ".",
+    "display": "standalone",
+    "theme_color": "#000000",
+    "background_color": "#000000"
+}

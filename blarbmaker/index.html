@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>the blarbmaker</title>
+
+        <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
+        <script defer src="scripts/main.js"></script>
+
+        <link rel="stylesheet" href="styles/main.css">
+
+        <link rel="manifest" href="manifest.json">
+    </head>
+    <body>
+        <div id="main-container" style="--preview-size: 0.5">
+            <div id="post-preview"></div>
+            <div id="post-toolbar">
+                <div id="post-resize-handle">
+                    :::
+                </div>
+            </div>
+            <textarea id="post-input" placeholder="write your text here..."></textarea>
+        </div>
+    </body>
+</html>
