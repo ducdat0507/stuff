@@ -27,9 +27,9 @@ let postInputInstance = CodeMirror(elms.postInputHolder, {
 });
 
 try {
-    postInputInstance.setValue(localStorage.getItem("blarbmaker-post"));
+    postInputInstance.setValue(localStorage.getItem("blarbmaker-post") || "");
 } catch {
-    
+
 }
 
 postInputInstance.on("change", (e) => {
