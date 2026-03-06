@@ -88,6 +88,13 @@ iconify-icon {
     height: 100%;
 }
 
+:is(#post-toolbar, #navigation-bar) hr {
+    height: 100%;
+    border: none;
+    border-left: 1px solid #fff3;
+    margin: 0;
+}
+
 #post-input-holder .CodeMirror-scroll {
     padding: 0.5em;
 }
