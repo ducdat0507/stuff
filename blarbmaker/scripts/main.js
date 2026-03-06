@@ -52,7 +52,7 @@ function onEditTimeout() {
     let value = postInputInstance.getValue();
     elms.postPreview.innerHTML = converter.makeHtml(value);
     let metadata = converter.getMetadata();
-    if (metadata?.title) {
+    if (metadata && metadata.title) {
         elms.postPreview.insertAdjacentHTML("afterbegin", `
             <h1>${metadata.title}</h1>    
         `);
