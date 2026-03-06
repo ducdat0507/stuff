@@ -6,22 +6,32 @@
         <title>the blarbmaker</title>
 
         <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/iconify-icon@3.0.0/dist/iconify-icon.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/mode/markdown/markdown.js"></script>
+
         <script defer src="scripts/main.js"></script>
 
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/theme/ayu-mirage.css">
         <link rel="stylesheet" href="styles/main.css">
 
         <link rel="manifest" href="manifest.json">
     </head>
     <body>
         <div id="main-container" style="--preview-size: 0.5">
-            <div id="post-preview"></div>
-            <div id="post-toolbar">
-                <div id="post-resize-handle">
-                    :::
-                </div>
+            <div id="navigation-bar">
+                <iconify-icon icon="lucide:grip-vertical" style="opacity: 0.5"></iconify-icon>
             </div>
-            <div id="post-input-holder">
-                <textarea id="post-input" placeholder="write your text here..."></textarea>
+            <div id="post-composer-container">
+                <div id="post-preview"></div>
+                <div id="post-toolbar">
+                    <div id="post-resize-handle">
+                        <iconify-icon icon="lucide:grip-vertical" style="opacity: 0.5"></iconify-icon>
+                    </div>
+                </div>
+                <div id="post-input-holder">
+                </div>
             </div>
         </div>
     </body>

@@ -1,7 +1,9 @@
 
 let elms = {
     mainContainer: document.querySelector("#main-container"),
-    postInput: document.querySelector("#post-input"),
+    navigationBar: document.querySelector("#navigation-bar"),
+    postInputHolder: document.querySelector("#post-input-holder"),
+    postComposerContainer: document.querySelector("#post-composer-container"),
     postResizeHandle: document.querySelector("#post-resize-handle"),
     postPreview: document.querySelector("#post-preview"),
 }
@@ -9,10 +11,18 @@ let elms = {
 let editTimeout = 0;
 let converter = new showdown.Converter();
 
-elms.postInput.value = localStorage.getItem("blarbmaker-post");
+let postInputInstance = CodeMirror(elms.postInputHolder, {
+    lineNumbers: false,
+    tabSize: 4,
+    mode: "markdown",
+    theme: "ayu-mirage",
+    styleActiveLine: true,
+});
 
-elms.postInput.addEventListener("input", (e) => {
-    localStorage.setItem("blarbmaker-post", elms.postInput.value);
+postInputInstance.setValue(localStorage.getItem("blarbmaker-post"));
+
+postInputInstance.on("change", (e) => {
+    localStorage.setItem("blarbmaker-post", postInputInstance.getValue());
 
     if (editTimeout) clearTimeout(editTimeout);
     editTimeout = setTimeout(onEditTimeout, 500);
@@ -20,7 +30,10 @@ elms.postInput.addEventListener("input", (e) => {
 
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     function moveEvent(e) {
-        elms.mainContainer.style.setProperty("--preview-size", Math.min(Math.max(e.clientY / window.innerHeight, 0), 1))
+        let currentSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
+        currentSize += e.movementY / elms.postComposerContainer.clientHeight;
+        currentSize = Math.min(Math.max(currentSize, 0), 1);
+        elms.mainContainer.style.setProperty("--preview-size", currentSize)
     }
     function upEvent(e) {
         elms.postResizeHandle.removeEventListener("pointermove", moveEvent);
@@ -33,8 +46,9 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
 })
 
 function onEditTimeout() {
-    if (elms.postInput.value) {
-        elms.postPreview.innerHTML = converter.makeHtml(elms.postInput.value);
+    let value = postInputInstance.getValue();
+    if (value) {
+        elms.postPreview.innerHTML = converter.makeHtml(value);
     } else {
         elms.postPreview.innerHTML = `
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
@@ -51,6 +65,7 @@ if (window.visualViewport) {
     function resizeHandler() {
         elms.mainContainer.style.height = window.visualViewport.height.toString() + 'px';
         document.body.style.height = window.visualViewport.height.toString() + 'px';
+        elms.navigationBar.scrollIntoView({ block: "start" })
     }
 
     window.visualViewport.addEventListener('resize', resizeHandler);
