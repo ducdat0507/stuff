@@ -72,6 +72,8 @@ iconify-icon {
 
     align-items: center;
     justify-content: center;
+
+    touch-action: manipulation;
 }
 
 #post-input-holder {
