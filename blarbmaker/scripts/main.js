@@ -14,11 +14,12 @@ let converter = new showdown.Converter({
 });
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
-    lineNumbers: false,
+    lineNumbers: true,
     tabSize: 4,
     mode: "markdown",
     theme: "ayu-mirage",
     styleActiveLine: true,
+    lineWrapping: true,
 });
 
 postInputInstance.setValue(localStorage.getItem("blarbmaker-post"));
