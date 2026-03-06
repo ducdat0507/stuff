@@ -2,7 +2,7 @@
 <html lang="en">
     <head>
         <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, interactive-widget=resizes-content">
         <title>the blarbmaker</title>
 
         <script src="https://cdn.jsdelivr.net/npm/showdown@1.9.0/dist/showdown.min.js"></script>
@@ -20,7 +20,9 @@
                     :::
                 </div>
             </div>
-            <textarea id="post-input" placeholder="write your text here..."></textarea>
+            <div id="post-input-holder">
+                <textarea id="post-input" placeholder="write your text here..."></textarea>
+            </div>
         </div>
     </body>
 </html>

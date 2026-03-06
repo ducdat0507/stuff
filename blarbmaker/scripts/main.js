@@ -45,3 +45,13 @@ function onEditTimeout() {
 }
 
 onEditTimeout();
+
+
+if (window.visualViewport) {
+    function resizeHandler() {
+        elms.mainContainer.style.height = window.visualViewport.height.toString() + 'px';
+        document.body.style.height = window.visualViewport.height.toString() + 'px';
+    }
+
+    window.visualViewport.addEventListener('resize', resizeHandler);
+}
