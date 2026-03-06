@@ -9,7 +9,9 @@ let elms = {
 }
 
 let editTimeout = 0;
-let converter = new showdown.Converter();
+let converter = new showdown.Converter({
+    metadata: true,
+});
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
@@ -47,9 +49,15 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
 
 function onEditTimeout() {
     let value = postInputInstance.getValue();
-    if (value) {
-        elms.postPreview.innerHTML = converter.makeHtml(value);
-    } else {
+    elms.postPreview.innerHTML = converter.makeHtml(value);
+    let metadata = converter.getMetadata();
+    if (metadata?.title) {
+        elms.postPreview.insertAdjacentHTML("afterbegin", `
+            <h1>${metadata.title}</h1>    
+        `);
+    }
+
+    if (!elms.postPreview.innerHTML) {
         elms.postPreview.innerHTML = `
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
             <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on my phone</p>
