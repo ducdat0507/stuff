@@ -1,7 +1,7 @@
 
-window.addEventListener("error", (e) => {
-    alert(e);
-})
+window.onerror = (msg, source, lineNo, colNo, error) => {
+    alert(error);
+}
 
 let elms = {
     mainContainer: document.querySelector("#main-container"),
