@@ -19,7 +19,6 @@ let converter = new showdown.Converter({
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
-    tabSize: 4,
     mode: "markdown",
     theme: "ayu-mirage",
     styleActiveLine: true,

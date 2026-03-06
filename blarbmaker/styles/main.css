@@ -95,8 +95,13 @@ iconify-icon {
     margin: 0;
 }
 
-#post-input-holder .CodeMirror-scroll {
+.CodeMirror-scroll {
     padding: 0.5em;
+}
+
+.CodeMirror-activeline {
+    padding-inline: 0.5em;
+    margin-inline: -0.5em;
 }
 
 #post-preview :is(p, h1, h2, h3, h4, h5, h6) {
