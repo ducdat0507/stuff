@@ -80,7 +80,7 @@ onEditTimeout();
 if (window.visualViewport) {
     function resizeHandler() {
         elms.mainContainer.style.height = window.visualViewport.height.toString() + 'px';
-        document.body.style.height = window.visualViewport.height.toString() + 'px';
+        elms.mainContainer.style.top = window.visualViewport.offsetTop.toString() + 'px';
         elms.navigationBar.scrollIntoView({ block: "start" })
     }
 
