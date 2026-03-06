@@ -1,4 +1,8 @@
 
+window.addEventListener("error", (e) => {
+    alert(e);
+})
+
 let elms = {
     mainContainer: document.querySelector("#main-container"),
     navigationBar: document.querySelector("#navigation-bar"),
