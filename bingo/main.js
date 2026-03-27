@@ -33,6 +33,7 @@ let bingoBoards = {
             "Shows public hatred towards JavaScript",
             "Has pixel art graphics scattered everywhere",
             "Recommends W3Schools as a reputable resource site",
+            `<span style='font-family: "MS PGothic", sans-serif'>MS Gothic and adjacent fonts</span>`,
             
             [
                 `"Copying is an act of love, please copy" under site footer`,
