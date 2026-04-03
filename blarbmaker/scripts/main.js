@@ -1,26 +1,46 @@
 
+window.onerror = (msg, source, lineNo, colNo, error) => {
+    alert(error);
+}
+
 let elms = {
     mainContainer: document.querySelector("#main-container"),
-    postInput: document.querySelector("#post-input"),
+    navigationBar: document.querySelector("#navigation-bar"),
+    postInputHolder: document.querySelector("#post-input-holder"),
+    postComposerContainer: document.querySelector("#post-composer-container"),
+    postToolbar: document.querySelector("#post-toolbar"),
     postResizeHandle: document.querySelector("#post-resize-handle"),
     postPreview: document.querySelector("#post-preview"),
 }
 
 let editTimeout = 0;
-let converter = new showdown.Converter();
+let converter = new showdown.Converter({
+    metadata: true,
+    underline: true,
+});
 
-elms.postInput.value = localStorage.getItem("blarbmaker-post");
+let postInputInstance = CodeMirror(elms.postInputHolder, {
+    lineNumbers: false,
+    mode: "markdown",
+    theme: "ayu-mirage",
+    styleActiveLine: true,
+    lineWrapping: true,
+});
 
-elms.postInput.addEventListener("input", (e) => {
-    localStorage.setItem("blarbmaker-post", elms.postInput.value);
-
+postInputInstance.on("change", (e) => {
     if (editTimeout) clearTimeout(editTimeout);
-    editTimeout = setTimeout(onEditTimeout, 500);
+    editTimeout = setTimeout(() => {
+        onEditTimeout();
+        savePost();
+    }, 500);
 })
 
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     function moveEvent(e) {
-        elms.mainContainer.style.setProperty("--preview-size", Math.min(Math.max(e.clientY / window.innerHeight, 0), 1))
+        let currentSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
+        currentSize += e.movementY / elms.postComposerContainer.clientHeight;
+        currentSize = Math.min(Math.max(currentSize, 0), 1);
+        elms.mainContainer.style.setProperty("--preview-size", currentSize)
     }
     function upEvent(e) {
         elms.postResizeHandle.removeEventListener("pointermove", moveEvent);
@@ -33,9 +53,21 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
 })
 
 function onEditTimeout() {
-    if (elms.postInput.value) {
-        elms.postPreview.innerHTML = converter.makeHtml(elms.postInput.value);
-    } else {
+
+    let value = postInputInstance.getValue();
+    elms.postPreview.innerHTML = converter.makeHtml(value);
+
+    let metadata = converter.getMetadata();
+    if (!value) metadata = null;
+    
+    if (metadata && metadata.title) {
+        elms.postPreview.insertAdjacentHTML("afterbegin", `
+            <h1>${metadata.title}</h1>    
+        `);
+    }
+    meta.posts[meta.currentPost].title = metadata?.title ?? "";
+
+    if (!elms.postPreview.innerHTML) {
         elms.postPreview.innerHTML = `
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
             <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on my phone</p>
@@ -44,4 +76,18 @@ function onEditTimeout() {
     }
 }
 
+if (window.visualViewport) {
+    function updateViewport() {
+        elms.mainContainer.style.height = window.visualViewport.height.toString() + 'px';
+        elms.mainContainer.style.top = window.visualViewport.offsetTop.toString() + 'px';
+        elms.navigationBar.scrollIntoView({ block: "start" })
+    }
+
+    window.visualViewport.addEventListener('resize', updateViewport);
+    window.visualViewport.addEventListener('scroll', updateViewport);
+    window.visualViewport.addEventListener('scrollend', updateViewport);
+}
+
+loadMeta();
+initToolbar();
 onEditTimeout();

@@ -2,19 +2,49 @@
     box-sizing: border-box;
 }
 
+body {
+    overflow: hidden;
+    touch-action: none;
+
+    color: white;
+    font-size: max(1em, 16px);
+    font-family: Arial, Helvetica, sans-serif;
+}
+
+iconify-icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+}
+
 #main-container {
     display: flex;
     flex-flow: column;
 
     background: #111;
-    color: white;
 
     position: fixed;
     inset: 0;
-    bottom: env();
 
-    font-size: max(1em, 16px);
-    font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden;
+}
+
+#navigation-bar {
+    height: calc(2em + 2px);
+    border-bottom: 2px solid #fff2;
+    background: #222;
+
+    display: flex;
+    align-items: stretch;
+
+    user-select: none;
+}
+
+#post-composer-container {
+    display: flex;
+    flex-flow: column;
+    height: 0;
+    flex-grow: 1;
 }
 
 #post-preview {
@@ -24,6 +54,7 @@
     padding: 0 1rem;
 
     overflow-y: auto;
+    touch-action: manipulation;
 }
 
 #post-toolbar {
@@ -45,24 +76,153 @@
     justify-content: center;
 }
 
-#post-input {
-    height: 0;
-    flex-grow: calc(1 - var(--preview-size, 0.5));
-    background: transparent;
-    border: none;
-    font: inherit;
-    font-family: 'Courier New', Courier, monospace;
-    color: inherit;
-    resize: none;
+.post-toolbar-button {
+    width: 2em;
+    display: flex;
 
-    padding: 1em;
-    min-height: none;
+    background: none;
+    color: white;
+    border: none;
+    border-radius: 0;
+    font: inherit;
+
+    align-items: center;
+    justify-content: center;
+}
+.post-toolbar-button:hover {
+    background: #fff1;
+}
+.post-toolbar-button:acttive {
+    background: #fff2;
 }
 
-#post-input:focus-visible {
-    outline: none;
+
+#post-input-holder {
+    height: 0;
+    flex-grow: calc(1 - var(--preview-size, 0.5));
+
+    position: relative;
+}
+
+#post-input-holder > * {
+    position: absolute;
+    inset: 0;
+
+    height: 100%;
+}
+
+:is(#post-toolbar, #navigation-bar) hr {
+    height: 100%;
+    border: none;
+    border-left: 1px solid #fff3;
+    margin: 0;
+}
+
+.CodeMirror-scroll {
+    padding: 0.5em;
+    touch-action: manipulation;
+}
+
+.CodeMirror-activeline {
+    padding-inline: 0.5em;
+    margin-inline: -0.5em;
 }
 
 #post-preview :is(p, h1, h2, h3, h4, h5, h6) {
     margin-block: 1rem;
+}
+
+.popup {
+    display: flex;
+    position: fixed;
+    inset: 0;
+    background: #0005;
+    align-items: center;
+    justify-content: center;
+}
+
+.popup-body {
+    display: flex;
+    align-items: stretch;
+    flex-flow: column;
+    margin: 1em;
+    width: min(calc(100% - 2em), 40em);
+    max-height: min(calc(100% - 2em), 80em);
+
+    background: #222;
+    border: 2px solid white;
+}
+
+.popup-title {
+    padding: 0.5em;
+    margin: 0;
+    font-size: 2em;
+    flex: 0 0;
+}
+
+.popup-content {
+    padding: 0 1em;
+    flex: 1;
+    overflow: auto;
+}
+
+.popup-actions {
+    display: flex;
+    padding: 1em;
+    flex: 0 0;
+    gap: 0.5em;
+    justify-content: stretch;
+}
+
+.popup-actions button {
+    border: 2px solid #fff2;
+    padding: 0.5em;
+    flex: 1;
+    background: #333;
+    font: inherit;
+    color: white;
+}
+
+
+.storage-post-box {
+    display: flex;
+    flex-flow: column;
+    border: 2px solid #fff2;
+    padding: 0.5em;
+    gap: 0.5em;
+    margin-bottom: 0.5em;
+}
+
+.storage-post-box:last-child {
+    margin-bottom: 0;
+}
+
+
+.storage-post-box h3 {
+    margin: 0;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    line-clamp: 2;
+    -webkitline-clamp: 2;
+    font-size: 1.25em;
+}
+
+.storage-post-box time {
+    font-style: italic;
+}
+
+.storage-post-box-actions {
+    display: flex;
+    flex: 0 0;
+    gap: 0.5em;
+    justify-content: stretch;
+}
+
+.storage-post-box-actions button {
+    border: 2px solid #fff2;
+    padding: 0.5em;
+    flex: 1;
+    background: #333;
+    font: inherit;
+    color: white;
 }
