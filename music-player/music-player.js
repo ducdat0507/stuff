@@ -475,14 +475,14 @@
             for (let a = 0; a < 2; a++) 
             {
                 var analyser = context.createAnalyser();
-                analyser.fftSize = 8192;
+                analyser.fftSize = 4096;
                 analyser.smoothingTimeConstant = 0;
                 
                 splitter.connect(analyser, a, 0);
                 this.#analysers.push(analyser);
             }
             let delay = context.createDelay();
-            delay.delayTime.setValueAtTime(4096 / context.sampleRate, 0);
+            delay.delayTime.setValueAtTime(2048 / context.sampleRate, 0);
             src.connect(delay);
             delay.connect(context.destination);
             this.classList.add("mp__initialized");
@@ -542,13 +542,13 @@
                 }
             }
 
-            drawFrequency(0, 0.5, 0, 1024, 1);
-            drawFrequency(1, 0.5, 1, 1024, 1);
+            drawFrequency(0, 0, .8, 2048, 1);
+            drawFrequency(1, 1, .2, 2048, 1);
 
             for (let a = 0; a < bars.length; a++) {
                 let data = this.#data[a];
                 data.x1 += data.v1 * delta;
-                data.v1 = Math.min(height, data.v1 - 5000 * delta);
+                data.v1 = Math.min(height, data.v1 - 4000 * delta);
                 if (data.x1 < 0) {
                     data.v1 = data.x1 = 0;
                 } else if (data.x1 < bars[a]) {
