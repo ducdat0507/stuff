@@ -8,6 +8,7 @@ let elms = {
     navigationBar: document.querySelector("#navigation-bar"),
     postInputHolder: document.querySelector("#post-input-holder"),
     postComposerContainer: document.querySelector("#post-composer-container"),
+    postToolbar: document.querySelector("#post-toolbar"),
     postResizeHandle: document.querySelector("#post-resize-handle"),
     postPreview: document.querySelector("#post-preview"),
 }
@@ -15,6 +16,7 @@ let elms = {
 let editTimeout = 0;
 let converter = new showdown.Converter({
     metadata: true,
+    underline: true,
 });
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
@@ -25,17 +27,12 @@ let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineWrapping: true,
 });
 
-try {
-    postInputInstance.setValue(localStorage.getItem("blarbmaker-post") || "");
-} catch {
-
-}
-
 postInputInstance.on("change", (e) => {
-    localStorage.setItem("blarbmaker-post", postInputInstance.getValue());
-
     if (editTimeout) clearTimeout(editTimeout);
-    editTimeout = setTimeout(onEditTimeout, 500);
+    editTimeout = setTimeout(() => {
+        onEditTimeout();
+        savePost();
+    }, 500);
 })
 
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
@@ -56,14 +53,19 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
 })
 
 function onEditTimeout() {
+
     let value = postInputInstance.getValue();
     elms.postPreview.innerHTML = converter.makeHtml(value);
+
     let metadata = converter.getMetadata();
+    if (!value) metadata = null;
+    
     if (metadata && metadata.title) {
         elms.postPreview.insertAdjacentHTML("afterbegin", `
             <h1>${metadata.title}</h1>    
         `);
     }
+    meta.posts[meta.currentPost].title = metadata?.title ?? "";
 
     if (!elms.postPreview.innerHTML) {
         elms.postPreview.innerHTML = `
@@ -73,9 +75,6 @@ function onEditTimeout() {
         `;
     }
 }
-
-onEditTimeout();
-
 
 if (window.visualViewport) {
     function updateViewport() {
@@ -88,3 +87,7 @@ if (window.visualViewport) {
     window.visualViewport.addEventListener('scroll', updateViewport);
     window.visualViewport.addEventListener('scrollend', updateViewport);
 }
+
+loadMeta();
+initToolbar();
+onEditTimeout();
