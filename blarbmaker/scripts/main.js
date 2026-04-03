@@ -23,7 +23,7 @@ let converter = new showdown.Converter({
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
     mode: "markdown",
-    theme: "tomorrow-night-eighties",
+    theme: "midnight",
     styleActiveLine: true,
     lineWrapping: true,
 });
