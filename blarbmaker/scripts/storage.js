@@ -6,6 +6,10 @@ function getNewMeta() {
     return {
         currentPost: "",
         posts: {},
+        prefs: {
+            justify: "none",
+            showLineNumbers: false,
+        }
     }
 }
 
@@ -69,5 +73,15 @@ function saveMeta() {
 function savePost() {
     meta.posts[meta.currentPost].lastEdited = Date.now();
     localStorage.setItem(meta.currentPost, postInputInstance.getValue());
+    saveMeta();
+}
+
+function deletePost(id) {
+    delete meta.posts[id];
+    localStorage.removeItem(id);
+    if (meta.currentPost == id) {
+        meta.currentPost = "";
+        postInputInstance.setValue("");
+    }
     saveMeta();
 }

@@ -17,11 +17,15 @@ iconify-icon {
     height: 1em;
 }
 
+button {
+    margin: 0;
+}
+
 #main-container {
     display: flex;
     flex-flow: column;
 
-    background: #111;
+    background: #000;
 
     position: fixed;
     inset: 0;
@@ -29,15 +33,22 @@ iconify-icon {
     overflow: hidden;
 }
 
-#navigation-bar {
-    height: calc(2em + 2px);
-    border-bottom: 2px solid #fff2;
-    background: #222;
+.tool-bar {
+    background: #111;
 
     display: flex;
     align-items: stretch;
 
     user-select: none;
+}
+
+.tool-bar .filler {
+    flex: 1;
+}
+
+#navigation-bar {
+    height: calc(2em + 2px);
+    border-bottom: 2px solid #fff2;
 }
 
 #post-composer-container {
@@ -56,16 +67,34 @@ iconify-icon {
     overflow-y: auto;
     touch-action: manipulation;
 }
+#post-preview.justify-paragraphs p {
+    text-align: justify;
+}
+#post-preview.justify-all {
+    text-align: justify;
+}
 
 #post-toolbar {
     height: calc(2em + 4px);
     border-block: 2px solid #fff2;
-    background: #222;
+    background: #111;
 
     display: flex;
     align-items: stretch;
 
     user-select: none;
+}
+
+#post-toolbar-items {
+    flex: 1;
+    display: flex;
+    align-items: stretch;
+    overflow: auto;
+    scrollbar-width: none;
+}
+
+#post-toolbar-items > hr:last-child {
+    margin-right: -1px;
 }
 
 #post-resize-handle {
@@ -74,13 +103,22 @@ iconify-icon {
 
     align-items: center;
     justify-content: center;
+
+    user-select: none;
+    cursor: grab;
+
+    background: #333;
 }
 
-.post-toolbar-button {
+#post-resize-handle:active {
+    cursor: grabbing;
+}
+
+.tool-bar-button {
     width: 2em;
     display: flex;
 
-    background: none;
+    background: #222;
     color: white;
     border: none;
     border-radius: 0;
@@ -89,11 +127,11 @@ iconify-icon {
     align-items: center;
     justify-content: center;
 }
-.post-toolbar-button:hover {
-    background: #fff1;
+.tool-bar-button:hover {
+    background: #333;
 }
-.post-toolbar-button:acttive {
-    background: #fff2;
+.tool-bar-button:acttive {
+    background: #444;
 }
 
 
@@ -123,7 +161,7 @@ iconify-icon {
     touch-action: manipulation;
 }
 
-.CodeMirror-activeline {
+.CodeMirror-activeline-background {
     padding-inline: 0.5em;
     margin-inline: -0.5em;
 }
@@ -146,11 +184,12 @@ iconify-icon {
     align-items: stretch;
     flex-flow: column;
     margin: 1em;
-    width: min(calc(100% - 2em), 40em);
+    width: min(calc(100% - 2em), 32em);
     max-height: min(calc(100% - 2em), 80em);
 
-    background: #222;
-    border: 2px solid white;
+    background: #111;
+    border: 2px solid #fff7;
+    box-shadow: 0.5em 0.5em #0007;
 }
 
 .popup-title {
@@ -164,6 +203,9 @@ iconify-icon {
     padding: 0 1em;
     flex: 1;
     overflow: auto;
+    display: flex;
+    flex-flow: column;
+    gap: 0.5em;
 }
 
 .popup-actions {
@@ -190,11 +232,6 @@ iconify-icon {
     border: 2px solid #fff2;
     padding: 0.5em;
     gap: 0.5em;
-    margin-bottom: 0.5em;
-}
-
-.storage-post-box:last-child {
-    margin-bottom: 0;
 }
 
 
@@ -225,4 +262,39 @@ iconify-icon {
     background: #333;
     font: inherit;
     color: white;
+}
+
+.prefs-category-header {
+    margin-bottom: 0;
+}
+.prefs-category-header:first-child {
+    margin-top: 0;
+}
+.prefs-field > * {
+    width: 100%;
+}
+.prefs-field button {
+    border: 2px solid #fff2;
+    padding: 0.5em;
+    flex: 1;
+    background: #333;
+    font: inherit;
+    color: white;
+}
+.prefs-field h4 {
+    margin: 0;
+    margin-bottom: 0.25em;
+    padding-block: 0.25em 0.05em;
+    border-bottom: 2px solid #fff2;
+    font-size: 1em;
+    font-weight: normal;
+}
+
+.field-choice-options {
+    display: flex;
+    gap: 0.25em;
+}
+.field-choice-options button[aria-selected="true"] {
+    background: white;
+    color: #333;
 }

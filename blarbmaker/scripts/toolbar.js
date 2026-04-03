@@ -19,20 +19,101 @@ function wrapAroundCursor(before, after) {
         line: cursorHead.line, 
         ch: cursorHead.ch + before.length
     }, "+input");
+}
 
+function makeListAtSelection(marker) {
+    let doc = postInputInstance.doc;
+    let sel = doc.getSelection();
+    
+    let cursorTo = doc.getCursor("to");
+    let cursorFrom = doc.getCursor("from");
+
+    let startLine = cursorFrom.line;
+    let endLine = cursorTo.line;
+
+    for (let i = startLine; i <= endLine; i++) {
+        let line = doc.getLine(i);
+        if (!line.startsWith(marker)) {
+            doc.replaceRange(marker, {line: i, ch: 0}, null, "+input");
+        }
+    }
+}
+
+function makeHeadingAtSelection() {
+    let doc = postInputInstance.doc;
+    let sel = doc.getSelection();
+    
+    let cursorTo = doc.getCursor("to");
+    let cursorFrom = doc.getCursor("from");
+
+    let startLine = cursorFrom.line;
+    let endLine = cursorTo.line;
+
+    for (let i = startLine; i <= endLine; i++) {
+        let line = doc.getLine(i);
+        let headingLevel = 0;
+        while (line.startsWith("#")) {
+            headingLevel++;
+            line = line.substring(1);
+        }
+        let targetLevel = (headingLevel % 6) + 1;
+        if (headingLevel != targetLevel) {
+            doc.replaceRange("#".repeat(targetLevel), {line: i, ch: 0}, {line: i, ch: headingLevel}, "+input");
+        }
+    }
+}
+
+function makeLinkAtSelection() {
+    let doc = postInputInstance.doc;
+    let sel = doc.getSelection();
+    
+    let cursorTo = doc.getCursor("to");
+    let cursorFrom = doc.getCursor("from");
+
+    let linkText = sel || "link text";
+    let linkUrl = "https://example.com";
+
+    let markdownLink = `[${linkText}](${linkUrl})`;
+
+    doc.replaceRange(markdownLink, cursorFrom, cursorTo, "+input");
+    
+    if (!sel) {
+        doc.setSelection({
+            line: cursorFrom.line, 
+            ch: cursorFrom.ch + 1
+        }, {
+            line: cursorFrom.line,
+            ch: cursorFrom.ch + 1 + linkText.length
+        }, "+input");
+    } else {
+        doc.setSelection({
+            line: cursorFrom.line, 
+            ch: cursorFrom.ch + 1 + sel.length + 2
+        }, {
+            line: cursorFrom.line,
+            ch: cursorFrom.ch + 1 + sel.length + 2 + linkUrl.length
+        }, "+input");
+    }
 }
 
 function makeToolbarButton(name, icon, func) {
-    var btn = document.createElement("button");
-    btn.className = "post-toolbar-button";
+    let btn = document.createElement("button");
+    btn.className = "tool-bar-button";
     btn.onclick = func;
 
-    var iconElm = document.createElement("iconify-icon");
+    let iconElm = document.createElement("iconify-icon");
     btn.append(iconElm);
     iconElm.icon = icon;
     iconElm.ariaLabel = name;
 
     return btn;
+}
+
+function makeToolbarFiller() {
+    let div = document.createElement("div");
+    div.className = "filler";
+    
+    return div;
 }
 
 function initToolbar() {
@@ -41,8 +122,13 @@ function initToolbar() {
             createPopup(popups.storage);
         }),
         document.createElement("hr"),
+        makeToolbarFiller(),
+        document.createElement("hr"),
+        makeToolbarButton("Preferences", "lucide:wrench", () => {
+            createPopup(popups.prefs);
+        }),
     )
-    elms.postToolbar.append(
+    elms.postToolbarItems.append(
         makeToolbarButton("Bold", "lucide:bold", () => {
             wrapAroundCursor("**", "**")
             postInputInstance.focus();
@@ -53,6 +139,24 @@ function initToolbar() {
         }),
         makeToolbarButton("Underline", "lucide:underline", () => {
             wrapAroundCursor("__", "__")
+            postInputInstance.focus();
+        }),
+        document.createElement("hr"),
+        makeToolbarButton("Heading", "lucide:type", () => {
+            makeHeadingAtSelection();
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Bullet List", "tabler:list", () => {
+            makeListAtSelection("- ")
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Numbered List", "tabler:list-numbers", () => {
+            makeListAtSelection("1. ")
+            postInputInstance.focus();
+        }),
+        document.createElement("hr"),
+        makeToolbarButton("Link", "lucide:link", () => {
+            makeLinkAtSelection();
             postInputInstance.focus();
         }),
         document.createElement("hr"),

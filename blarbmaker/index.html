@@ -13,29 +13,33 @@
 
         <script src="scripts/storage.js"></script>
         <script src="scripts/toolbar.js"></script>
+        <script src="scripts/utils.js"></script>
+        <script src="scripts/prefs.js"></script>
 
         <script src="scripts/popup.js"></script>
         <script src="scripts/popups/storage.js"></script>
+        <script src="scripts/popups/prefs.js"></script>
 
         <script defer src="scripts/main.js"></script>
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.css">
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/theme/ayu-mirage.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/theme/tomorrow-night-eighties.css">
         <link rel="stylesheet" href="styles/main.css">
 
         <link rel="manifest" href="manifest.json">
     </head>
     <body>
         <div id="main-container" style="--preview-size: 0.5">
-            <div id="navigation-bar">
+            <div id="navigation-bar" class="tool-bar">
             </div>
             <div id="post-composer-container">
                 <div id="post-preview"></div>
-                <div id="post-toolbar">
+                <div id="post-toolbar" class="tool-bar">
                     <div id="post-resize-handle">
-                        <iconify-icon icon="lucide:grip" style="opacity: 0.3"></iconify-icon>
+                        <iconify-icon icon="lucide:grip" style="opacity: 0.5"></iconify-icon>
                     </div>
                     <hr/>
+                    <div id="post-toolbar-items" class="filter"></div>
                 </div>
                 <div id="post-input-holder">
                 </div>

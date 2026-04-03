@@ -9,6 +9,7 @@ let elms = {
     postInputHolder: document.querySelector("#post-input-holder"),
     postComposerContainer: document.querySelector("#post-composer-container"),
     postToolbar: document.querySelector("#post-toolbar"),
+    postToolbarItems: document.querySelector("#post-toolbar-items"),
     postResizeHandle: document.querySelector("#post-resize-handle"),
     postPreview: document.querySelector("#post-preview"),
 }
@@ -22,7 +23,7 @@ let converter = new showdown.Converter({
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
     mode: "markdown",
-    theme: "ayu-mirage",
+    theme: "tomorrow-night-eighties",
     styleActiveLine: true,
     lineWrapping: true,
 });
@@ -70,7 +71,7 @@ function onEditTimeout() {
     if (!elms.postPreview.innerHTML) {
         elms.postPreview.innerHTML = `
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
-            <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on my phone</p>
+            <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on the go with my phone</p>
             <p style="opacity: 0.5">just write some markdown on the box below and a preview will be shown here</p>
         `;
     }
@@ -91,3 +92,4 @@ if (window.visualViewport) {
 loadMeta();
 initToolbar();
 onEditTimeout();
+updatePrefs();
