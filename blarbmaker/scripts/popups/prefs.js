@@ -58,9 +58,28 @@ popups.prefs = {
         popup.$title.textContent = "Preferences";
 
         popup.$content.append(
+            this.makeCategoryHeader("Editor"),
+            this.makeBooleanField(
+                "Line numbers",
+                "Hidden", "Shown",
+                meta.prefs.showLineNumbers,
+                (value) => {
+                    meta.prefs.showLineNumbers = value;
+                    updatePrefs(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Sync scroll",
+                "Disabled", "Enabled",
+                meta.prefs.syncScroll,
+                (value) => {
+                    meta.prefs.syncScroll = value;
+                    updatePrefs(); saveMeta();
+                }
+            ),
             this.makeCategoryHeader("Preview"),
             this.makeChoiceField(
-                "Justify",
+                "Justify text",
                 {
                     none: "None",
                     paragraphs: "<p> only",
@@ -72,16 +91,19 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeCategoryHeader("Editor"),
-            this.makeBooleanField(
-                "Line numbers",
-                "Hidden", "Shown",
-                meta.prefs.showLineNumbers,
+            this.makeChoiceField(
+                "Line height",
+                {
+                    tight: "Tight",
+                    normal: "Normal",
+                    wide: "Wide",
+                },
+                meta.prefs.previewLineHeight,
                 (value) => {
-                    meta.prefs.showLineNumbers = value;
+                    meta.prefs.previewLineHeight = value;
                     updatePrefs(); saveMeta();
                 }
-            )  
+            ),
         );
 
         let closeBtn = document.createElement("button");

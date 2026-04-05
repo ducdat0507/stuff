@@ -8,7 +8,9 @@ function getNewMeta() {
         posts: {},
         prefs: {
             justify: "none",
+            previewLineHeight: "normal",
             showLineNumbers: false,
+            syncScroll: true,
         }
     }
 }
@@ -21,8 +23,8 @@ function getNewPost() {
 }
 
 function patchObject(target, source) {
-    for (id in source) {
-        if (!(id in target)) {
+    for (let id in source) {
+        if (target[id] === undefined) {
             target[id] = source[id];
         } else if (typeof target == "object") {
             patchObject(target[id], source[id]);
@@ -34,7 +36,8 @@ function loadMeta() {
     try {
         meta = JSON.parse(localStorage.getItem("blarbmaker-meta"));
         patchObject(meta, getNewMeta());
-    } catch {
+    } catch (e) {
+        console.log(e);
         meta = getNewMeta();
     }
 

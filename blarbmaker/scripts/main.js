@@ -3,6 +3,8 @@ window.onerror = (msg, source, lineNo, colNo, error) => {
     alert(error);
 }
 
+
+
 let elms = {
     mainContainer: document.querySelector("#main-container"),
     navigationBar: document.querySelector("#navigation-bar"),
@@ -10,15 +12,29 @@ let elms = {
     postComposerContainer: document.querySelector("#post-composer-container"),
     postToolbar: document.querySelector("#post-toolbar"),
     postToolbarItems: document.querySelector("#post-toolbar-items"),
+    postToolbarSideItems: document.querySelector("#post-toolbar-side-items"),
     postResizeHandle: document.querySelector("#post-resize-handle"),
     postPreview: document.querySelector("#post-preview"),
 }
 
+
+
 let editTimeout = 0;
-let converter = new showdown.Converter({
-    metadata: true,
-    underline: true,
-});
+
+
+
+let md = new markdownit({
+    html: true,
+    linkify: true,
+    typographer: true,
+}).use(ext.frontMatter, (fm) => {
+    try {
+        fm = jsyaml.load(fm);
+        md.metadata = fm;
+    } catch {
+        md.metadata = null;
+    }
+}).use(ext.sourceMap).use(ext.underline)
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
@@ -28,6 +44,119 @@ let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineWrapping: true,
 });
 
+
+
+
+function onEditTimeout() {
+    let value = postInputInstance.getValue();
+    md.metadata = null;
+    elms.postPreview.innerHTML = md.render(value);
+    let metadata = md.metadata;
+    
+    if (metadata && metadata.title) {
+        elms.postPreview.insertAdjacentHTML("afterbegin", `
+            <h1>${metadata.title}</h1>    
+        `);
+    }
+    meta.posts[meta.currentPost].title = metadata?.title ?? "";
+
+    if (!elms.postPreview.innerHTML) {
+        elms.postPreview.innerHTML = `
+            <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
+            <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on the go with my phone</p>
+            <p style="opacity: 0.5">just write some markdown on the box below and a preview will be shown here</p>
+        `;
+    }
+
+    elms.postPreview.querySelectorAll("a").forEach(a => a.addEventListener("click", onLinkClick));
+}
+
+function onLinkClick(e) {
+    e.preventDefault();
+}
+
+let syncScrollAntiRecursion = false;
+
+function syncScrollEditorToPreview() {
+    let editor = postInputInstance;
+    let preview = elms.postPreview;
+
+    let scrollPosition = preview.scrollTop;
+    let scrollRatio = scrollPosition / (preview.scrollHeight - preview.clientHeight);
+    scrollPosition += scrollRatio * preview.clientHeight;
+
+    let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
+    let targetAnchor = null, nextAnchor = null;
+    if (scrollPosition >= anchors.at(-1).offsetTop) {
+        targetAnchor = anchors.at(-1);
+        nextAnchor = null;
+    } else for (let i = 0; i < anchors.length; i++) {
+        if (anchors[i].offsetTop >= scrollPosition) {
+            targetAnchor = anchors[i - 1];
+            nextAnchor = anchors[i];
+            break;
+        }
+    }
+
+    if (targetAnchor || nextAnchor) {
+
+        let targetPosition = targetAnchor ? targetAnchor.offsetTop : 0;
+        let nextPosition = nextAnchor ? nextAnchor.offsetTop : preview.scrollHeight;
+
+        let targetLine = targetAnchor ? parseInt(targetAnchor.getAttribute("data-src-line")) : 0;
+        let nextLine = nextAnchor ? parseInt(nextAnchor.getAttribute("data-src-line")) : editor.lineCount();
+        let lineRatio = (scrollPosition - targetPosition) / (nextPosition - targetPosition);
+        if (!Number.isFinite(lineRatio)) lineRatio = 0.5;
+
+        let finalLine = Math.round(targetLine + (nextLine - targetLine) * lineRatio);
+        finalLine = Math.min(Math.max(finalLine, 0), editor.lineCount() - 1);
+        syncScrollAntiRecursion = true;
+        editor.scrollIntoView({line: finalLine, ch: 0}, 100);
+    }
+}
+
+function syncScrollPreviewToEditor() {
+    let editor = postInputInstance;
+    let preview = elms.postPreview;
+
+    let scrollInfo = editor.getScrollInfo();
+    let scrollPosition = scrollInfo.top;
+    let scrollRatio = scrollPosition / (scrollInfo.height - scrollInfo.clientHeight);
+    let scrollLine = editor.lineAtHeight(scrollPosition + scrollInfo.clientHeight * scrollRatio, "local");
+
+    let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
+    let targetAnchor = null, nextAnchor = null;
+    if (scrollLine >= parseInt(anchors.at(-1).getAttribute("data-src-line"))) {
+        targetAnchor = anchors.at(-1);
+        nextAnchor = null;
+    } else for (let i = 0; i < anchors.length; i++) {
+        if (parseInt(anchors[i].getAttribute("data-src-line")) >= scrollLine) {
+            targetAnchor = anchors[i - 1];
+            nextAnchor = anchors[i];
+            break;
+        }
+    }
+
+    console.log(targetAnchor, nextAnchor);
+    if (targetAnchor || nextAnchor) {
+        let targetLine = targetAnchor ? parseInt(targetAnchor.getAttribute("data-src-line")) : 0;
+        let nextLine = nextAnchor ? parseInt(nextAnchor.getAttribute("data-src-line")) : editor.lineCount();
+        let lineRatio = (scrollLine - targetLine) / (nextLine - targetLine)
+        if (!Number.isFinite(lineRatio)) lineRatio = 0.5;
+
+        let targetPosition = targetAnchor ? targetAnchor.offsetTop : 0;
+        let nextPosition = nextAnchor ? nextAnchor.offsetTop : preview.scrollHeight;
+        let finalPosition = targetPosition + (nextPosition - targetPosition) * lineRatio;
+        finalPosition -= scrollRatio * preview.clientHeight;
+
+        console.log(scrollLine, lineRatio, finalPosition);
+        syncScrollAntiRecursion = true;
+        preview.scrollTop = finalPosition;
+    }
+}
+
+
+
 postInputInstance.on("change", (e) => {
     if (editTimeout) clearTimeout(editTimeout);
     editTimeout = setTimeout(() => {
@@ -35,6 +164,26 @@ postInputInstance.on("change", (e) => {
         savePost();
     }, 500);
 })
+
+postInputInstance.on("scroll", (e) => {
+    if (meta.prefs.syncScroll) {
+        if (syncScrollAntiRecursion) {
+            syncScrollAntiRecursion = false;
+        } else {
+            syncScrollPreviewToEditor();
+        }
+    }
+}, { passive: true })
+
+elms.postPreview.addEventListener("scroll", (e) => {
+    if (meta.prefs.syncScroll) {
+        if (syncScrollAntiRecursion) {
+            syncScrollAntiRecursion = false;
+        } else {
+            syncScrollEditorToPreview();
+        }
+    }
+}, { passive: true })
 
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     function moveEvent(e) {
@@ -53,29 +202,7 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     elms.postResizeHandle.addEventListener("pointerup", upEvent);
 })
 
-function onEditTimeout() {
 
-    let value = postInputInstance.getValue();
-    elms.postPreview.innerHTML = converter.makeHtml(value);
-
-    let metadata = converter.getMetadata();
-    if (!value) metadata = null;
-    
-    if (metadata && metadata.title) {
-        elms.postPreview.insertAdjacentHTML("afterbegin", `
-            <h1>${metadata.title}</h1>    
-        `);
-    }
-    meta.posts[meta.currentPost].title = metadata?.title ?? "";
-
-    if (!elms.postPreview.innerHTML) {
-        elms.postPreview.innerHTML = `
-            <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
-            <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on the go with my phone</p>
-            <p style="opacity: 0.5">just write some markdown on the box below and a preview will be shown here</p>
-        `;
-    }
-}
 
 if (window.visualViewport) {
     function updateViewport() {
@@ -88,6 +215,8 @@ if (window.visualViewport) {
     window.visualViewport.addEventListener('scroll', updateViewport);
     window.visualViewport.addEventListener('scrollend', updateViewport);
 }
+
+
 
 loadMeta();
 initToolbar();

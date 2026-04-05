@@ -63,7 +63,7 @@ function makeHeadingAtSelection() {
     }
 }
 
-function makeLinkAtSelection() {
+function makeLinkAtSelection(begin = "[", middle = "](", end = ")") {
     let doc = postInputInstance.doc;
     let sel = doc.getSelection();
     
@@ -73,25 +73,25 @@ function makeLinkAtSelection() {
     let linkText = sel || "link text";
     let linkUrl = "https://example.com";
 
-    let markdownLink = `[${linkText}](${linkUrl})`;
+    let markdownLink = `${begin}${linkText}${middle}${linkUrl}${end}`;
 
     doc.replaceRange(markdownLink, cursorFrom, cursorTo, "+input");
     
     if (!sel) {
         doc.setSelection({
             line: cursorFrom.line, 
-            ch: cursorFrom.ch + 1
+            ch: cursorFrom.ch + begin.length
         }, {
             line: cursorFrom.line,
-            ch: cursorFrom.ch + 1 + linkText.length
+            ch: cursorFrom.ch + begin.length + linkText.length
         }, "+input");
     } else {
         doc.setSelection({
             line: cursorFrom.line, 
-            ch: cursorFrom.ch + 1 + sel.length + 2
+            ch: cursorFrom.ch + begin.length + sel.length + middle.length
         }, {
             line: cursorFrom.line,
-            ch: cursorFrom.ch + 1 + sel.length + 2 + linkUrl.length
+            ch: cursorFrom.ch + begin.length + sel.length + middle.length + linkUrl.length
         }, "+input");
     }
 }
@@ -141,6 +141,10 @@ function initToolbar() {
             wrapAroundCursor("__", "__")
             postInputInstance.focus();
         }),
+        makeToolbarButton("Strikethrough", "lucide:strikethrough", () => {
+            wrapAroundCursor("~~", "~~")
+            postInputInstance.focus();
+        }),
         document.createElement("hr"),
         makeToolbarButton("Heading", "lucide:type", () => {
             makeHeadingAtSelection();
@@ -159,6 +163,20 @@ function initToolbar() {
             makeLinkAtSelection();
             postInputInstance.focus();
         }),
+        makeToolbarButton("Image", "lucide:image", () => {
+            makeLinkAtSelection("![");
+            postInputInstance.focus();
+        }),
         document.createElement("hr"),
     )
+    elms.postToolbarSideItems.append(
+        makeToolbarButton("Undo", "lucide:undo", () => {
+            postInputInstance.undo();
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Redo", "lucide:redo", () => {
+            postInputInstance.undo();
+            postInputInstance.focus();
+        }),
+    ) 
 }

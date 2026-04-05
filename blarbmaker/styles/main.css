@@ -21,6 +21,10 @@ button {
     margin: 0;
 }
 
+a {
+    color: #abf;
+}
+
 #main-container {
     display: flex;
     flex-flow: column;
@@ -61,17 +65,83 @@ button {
 #post-preview {
     height: 0;
     flex-grow: var(--preview-size, 0.5);
+    line-height: 1.25;
 
     padding: 0 1rem;
 
     overflow-y: auto;
     touch-action: manipulation;
 }
+
+#post-preview img {
+    max-width: min(100%, 40em);
+}
+
+#post-preview :not(pre) > code {
+    background: #111;
+    border: 1px solid #fff3;
+    border-radius: 0.25em;
+    padding-inline: 0.25em;
+}
+
+#post-preview pre {
+    background: #111;
+    border: 1px solid #fff3;
+    border-radius: 0.25em;
+    padding: 0.5em;
+    overflow: auto;
+}
+
+#post-preview table {
+    background: #111;
+    border: 1px solid #fff3;
+    border-radius: 0.25em;
+    margin-block: 1em;
+    overflow: auto;
+    border-collapse: collapse;
+}
+
+#post-preview :is(ol, ul) {
+    padding-inline-start: 2em;
+}
+
+#post-preview :is(ol, ul) :is(ol, ul) {
+    padding-inline-start: 1em;
+}
+
+#post-preview :is(tr, td, th) {
+    border: 1px solid #fff3;
+    border-radius: 0.25em;
+}
+
+#post-preview :is(td, th) {
+    padding: 0.25em 0.4em;
+}
+
+#post-preview blockquote {
+    margin-inline-start: 1em;
+    padding-inline-start: calc(1em - 4px);
+    border-inline-start: 4px solid #fff5;
+    border-radius: 4px;
+    color: #fffc;
+}
+
+#post-preview blockquote blockquote {
+    margin-inline-start: 0em;
+}
+
+
 #post-preview.justify-paragraphs p {
     text-align: justify;
 }
 #post-preview.justify-all {
     text-align: justify;
+}
+#post-preview.line-height-tight {
+    line-height: 1.15;
+}
+#post-preview.line-height-wide :is(p, pre, table) {
+    line-height: 1.5;
 }
 
 #post-toolbar {
@@ -85,8 +155,7 @@ button {
     user-select: none;
 }
 
-#post-toolbar-items {
-    flex: 1;
+#post-toolbar-items, #post-toolbar-side-items {
     display: flex;
     align-items: stretch;
     overflow: auto;
@@ -266,6 +335,11 @@ button {
 
 .prefs-category-header {
     margin-bottom: 0;
+    padding-bottom: 0.25em;
+    border-bottom: 2px solid #fff;
+    position: sticky;
+    background: #111;
+    top: 0;
 }
 .prefs-category-header:first-child {
     margin-top: 0;
@@ -284,7 +358,7 @@ button {
 .prefs-field h4 {
     margin: 0;
     margin-bottom: 0.25em;
-    padding-block: 0.25em 0.05em;
+    padding-block: 0.25em 0.35em;
     border-bottom: 2px solid #fff2;
     font-size: 1em;
     font-weight: normal;
@@ -293,6 +367,7 @@ button {
 .field-choice-options {
     display: flex;
     gap: 0.25em;
+    padding-left: 1em;
 }
 .field-choice-options button[aria-selected="true"] {
     background: white;
