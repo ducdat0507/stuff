@@ -5,5 +5,11 @@ function updatePrefs() {
     elms.postPreview.classList.toggle("line-height-tight", meta.prefs.previewLineHeight == "tight");
     elms.postPreview.classList.toggle("line-height-wide", meta.prefs.previewLineHeight == "wide");
 
+    md.set({
+        typographer: meta.prefs.fancyPants
+    })
+
     postInputInstance.setOption("lineNumbers", !!meta.prefs.showLineNumbers);
+    postInputInstance.setOption("showWhitespaces", !!meta.prefs.showWhitespaces);
+    postInputInstance.setOption("lineWrapping", !!meta.prefs.wrapLongLines);
 }

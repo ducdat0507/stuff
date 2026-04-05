@@ -90,25 +90,25 @@ function syncScrollEditorToPreview() {
     let fromAnchorPos = 0, toAnchorPos = 0;
     if (scrollPosition >= anchors.at(-1).offsetTop + anchors.at(-1).clientHeight) {
         fromAnchorLine = parseInt(anchors.at(-1).getAttribute("data-src-line-end"));
-        toAnchorLine = editor.lineCount() + 1;
         fromAnchorPos = anchors.at(-1).offsetTop + anchors.at(-1).clientHeight;
+        toAnchorLine = editor.lineCount() + 1;
         toAnchorPos = preview.scrollHeight;
     } else if (scrollPosition < anchors[0].offsetTop) {
         fromAnchorLine = 0;
-        toAnchorLine = parseInt(anchors[0].getAttribute("data-src-line"));
         fromAnchorPos = 0;
+        toAnchorLine = parseInt(anchors[0].getAttribute("data-src-line"));
         toAnchorPos = anchors[0].offsetTop;
     } else for (let i = 0; i < anchors.length; i++) {
         if (scrollPosition < anchors[i].offsetTop) {
             fromAnchorLine = parseInt(anchors[i - 1].getAttribute("data-src-line-end"));
-            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
             fromAnchorPos = anchors[i - 1].offsetTop + anchors[i - 1].clientHeight;
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
             toAnchorPos = anchors[i].offsetTop;
             break;
         } else if (scrollPosition < anchors[i].offsetTop + anchors[i].clientHeight) {
             fromAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
-            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line-end"));
             fromAnchorPos = anchors[i].offsetTop;
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line-end"));
             toAnchorPos = anchors[i].offsetTop + anchors[i].clientHeight;
             break;
         }

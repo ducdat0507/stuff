@@ -9,7 +9,10 @@ function getNewMeta() {
         prefs: {
             justify: "none",
             previewLineHeight: "normal",
+            fancyPants: true,
             showLineNumbers: false,
+            showWhitespaces: false,
+            wrapLongLines: true,
             syncScroll: true,
         }
     }

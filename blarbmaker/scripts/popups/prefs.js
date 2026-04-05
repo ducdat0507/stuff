@@ -69,7 +69,25 @@ popups.prefs = {
                 }
             ),
             this.makeBooleanField(
-                "Sync scroll",
+                "Whitespaces",
+                "Hidden", "Shown",
+                meta.prefs.showWhitespaces,
+                (value) => {
+                    meta.prefs.showWhitespaces = value;
+                    updatePrefs(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Wrap long lines",
+                "Disabled", "Enabled",
+                meta.prefs.wrapLongLines,
+                (value) => {
+                    meta.prefs.wrapLongLines = value;
+                    updatePrefs(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Sync scroll positions",
                 "Disabled", "Enabled",
                 meta.prefs.syncScroll,
                 (value) => {
@@ -102,6 +120,15 @@ popups.prefs = {
                 (value) => {
                     meta.prefs.previewLineHeight = value;
                     updatePrefs(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Fancy-pants typography",
+                "Disabled", "Enabled",
+                meta.prefs.fancyPants,
+                (value) => {
+                    meta.prefs.fancyPants = value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
                 }
             ),
         );

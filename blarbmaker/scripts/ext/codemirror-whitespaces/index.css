@@ -1,0 +1,27 @@
+
+.cm-whitespace {
+    
+}
+.cm-whitespace::before {
+    position: absolute;
+    opacity: 0.2;
+}
+
+.cm-whitespace-space-1::before  { content: "•"; }
+.cm-whitespace-space-2::before  { content: "••"; }
+.cm-whitespace-space-3::before  { content: "•••"; }
+.cm-whitespace-space-4::before  { content: "••••"; }
+.cm-whitespace-space-5::before  { content: "•••••"; }
+.cm-whitespace-space-6::before  { content: "••••••"; }
+.cm-whitespace-space-7::before  { content: "•••••••"; }
+.cm-whitespace-space-8::before  { content: "••••••••"; }
+.cm-whitespace-space-9::before  { content: "•••••••••"; }
+.cm-whitespace-space-10::before { content: "••••••••••"; }
+.cm-whitespace-space-11::before { content: "•••••••••••"; }
+.cm-whitespace-space-12::before { content: "••••••••••••"; }
+.cm-whitespace-space-13::before { content: "•••••••••••••"; }
+.cm-whitespace-space-14::before { content: "••••••••••••••"; }
+.cm-whitespace-space-15::before { content: "•••••••••••••••"; }
+.cm-whitespace-space-16::before { content: "••••••••••••••••"; }
+
+.cm-whitespace-tab::before { content: "⇥"; }
