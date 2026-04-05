@@ -109,7 +109,6 @@ function syncScrollEditorToPreview() {
         if (!Number.isFinite(lineRatio)) lineRatio = 0.5;
 
         let finalLine = Math.round(targetLine + (nextLine - targetLine) * lineRatio);
-        finalLine = Math.min(Math.max(finalLine, 0), editor.lineCount() - 1);
         syncScrollAntiRecursion = true;
         editor.scrollIntoView({line: finalLine, ch: 0}, 100);
     }
@@ -137,7 +136,6 @@ function syncScrollPreviewToEditor() {
         }
     }
 
-    console.log(targetAnchor, nextAnchor);
     if (targetAnchor || nextAnchor) {
         let targetLine = targetAnchor ? parseInt(targetAnchor.getAttribute("data-src-line")) : 0;
         let nextLine = nextAnchor ? parseInt(nextAnchor.getAttribute("data-src-line")) : editor.lineCount();
@@ -148,8 +146,7 @@ function syncScrollPreviewToEditor() {
         let nextPosition = nextAnchor ? nextAnchor.offsetTop : preview.scrollHeight;
         let finalPosition = targetPosition + (nextPosition - targetPosition) * lineRatio;
         finalPosition -= scrollRatio * preview.clientHeight;
-
-        console.log(scrollLine, lineRatio, finalPosition);
+        
         syncScrollAntiRecursion = true;
         preview.scrollTop = finalPosition;
     }
