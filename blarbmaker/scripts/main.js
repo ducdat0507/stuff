@@ -86,32 +86,42 @@ function syncScrollEditorToPreview() {
     scrollPosition += scrollRatio * preview.clientHeight;
 
     let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
-    let targetAnchor = null, nextAnchor = null;
-    if (scrollPosition >= anchors.at(-1).offsetTop) {
-        targetAnchor = anchors.at(-1);
-        nextAnchor = null;
+    let fromAnchorLine = 0, toAnchorLine = 0;
+    let fromAnchorPos = 0, toAnchorPos = 0;
+    if (scrollPosition >= anchors.at(-1).offsetTop + anchors.at(-1).clientHeight) {
+        fromAnchorLine = parseInt(anchors.at(-1).getAttribute("data-src-line-end"));
+        toAnchorLine = editor.lineCount() + 1;
+        fromAnchorPos = anchors.at(-1).offsetTop + anchors.at(-1).clientHeight;
+        toAnchorPos = preview.scrollHeight;
+    } else if (scrollPosition < anchors[0].offsetTop) {
+        fromAnchorLine = 0;
+        toAnchorLine = parseInt(anchors[0].getAttribute("data-src-line"));
+        fromAnchorPos = 0;
+        toAnchorPos = anchors[0].offsetTop;
     } else for (let i = 0; i < anchors.length; i++) {
-        if (anchors[i].offsetTop >= scrollPosition) {
-            targetAnchor = anchors[i - 1];
-            nextAnchor = anchors[i];
+        if (scrollPosition < anchors[i].offsetTop) {
+            fromAnchorLine = parseInt(anchors[i - 1].getAttribute("data-src-line-end"));
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
+            fromAnchorPos = anchors[i - 1].offsetTop + anchors[i - 1].clientHeight;
+            toAnchorPos = anchors[i].offsetTop;
+            break;
+        } else if (scrollPosition < anchors[i].offsetTop + anchors[i].clientHeight) {
+            fromAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line-end"));
+            fromAnchorPos = anchors[i].offsetTop;
+            toAnchorPos = anchors[i].offsetTop + anchors[i].clientHeight;
             break;
         }
     }
 
-    if (targetAnchor || nextAnchor) {
+    let lineRatio = (scrollPosition - fromAnchorPos) / (toAnchorPos - fromAnchorPos);
+    if (fromAnchorLine == toAnchorLine) lineRatio = 0;
 
-        let targetPosition = targetAnchor ? targetAnchor.offsetTop : 0;
-        let nextPosition = nextAnchor ? nextAnchor.offsetTop : preview.scrollHeight;
+    let finalPosition = editor.heightAtLine(fromAnchorLine, "local") + lineRatio * (editor.heightAtLine(toAnchorLine, "local") - editor.heightAtLine(fromAnchorLine, "local"));
+    finalPosition -= scrollRatio * editor.getScrollInfo().clientHeight;
 
-        let targetLine = targetAnchor ? parseInt(targetAnchor.getAttribute("data-src-line")) : 0;
-        let nextLine = nextAnchor ? parseInt(nextAnchor.getAttribute("data-src-line")) : editor.lineCount();
-        let lineRatio = (scrollPosition - targetPosition) / (nextPosition - targetPosition);
-        if (!Number.isFinite(lineRatio)) lineRatio = 0.5;
-
-        let finalLine = Math.round(targetLine + (nextLine - targetLine) * lineRatio);
-        syncScrollAntiRecursion = true;
-        editor.scrollIntoView({line: finalLine, ch: 0}, 100);
-    }
+    syncScrollAntiRecursion = true;
+    editor.scrollTo(0, finalPosition);
 }
 
 function syncScrollPreviewToEditor() {
@@ -121,35 +131,49 @@ function syncScrollPreviewToEditor() {
     let scrollInfo = editor.getScrollInfo();
     let scrollPosition = scrollInfo.top;
     let scrollRatio = scrollPosition / (scrollInfo.height - scrollInfo.clientHeight);
-    let scrollLine = editor.lineAtHeight(scrollPosition + scrollInfo.clientHeight * scrollRatio, "local");
+    scrollPosition += scrollInfo.clientHeight * scrollRatio;
+    let scrollLine = editor.lineAtHeight(scrollPosition , "local");
+    let lineStartPos = editor.heightAtLine(scrollLine, "local");
+    let lineEndPos = scrollLine + 1 > editor.lineCount() ? scrollInfo.height : editor.heightAtLine(scrollLine + 1, "local");
+    let lineFraction = (scrollPosition - lineStartPos) / (lineEndPos - lineStartPos);
 
     let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
-    let targetAnchor = null, nextAnchor = null;
-    if (scrollLine >= parseInt(anchors.at(-1).getAttribute("data-src-line"))) {
-        targetAnchor = anchors.at(-1);
-        nextAnchor = null;
+    let fromAnchorLine = 0, toAnchorLine = 0;
+    let fromAnchorPos = 0, toAnchorPos = 0;
+    if (scrollLine >= parseInt(anchors.at(-1).getAttribute("data-src-line-end"))) {
+        fromAnchorLine = parseInt(anchors.at(-1).getAttribute("data-src-line-end"));
+        fromAnchorPos = anchors.at(-1).offsetTop;
+        toAnchorLine = editor.lineCount() + 1;
+        toAnchorPos = scrollInfo.height;
+    } else if (scrollLine < parseInt(anchors[0].getAttribute("data-src-line"))) {
+        fromAnchorLine = 0;
+        fromAnchorPos = 0;
+        toAnchorLine = parseInt(anchors[0].getAttribute("data-src-line"));
+        toAnchorPos = anchors[0].offsetTop;
     } else for (let i = 0; i < anchors.length; i++) {
-        if (parseInt(anchors[i].getAttribute("data-src-line")) >= scrollLine) {
-            targetAnchor = anchors[i - 1];
-            nextAnchor = anchors[i];
+        if (scrollLine < parseInt(anchors[i].getAttribute("data-src-line"))) {
+            fromAnchorLine = parseInt(anchors[i - 1].getAttribute("data-src-line-end"));
+            fromAnchorPos = anchors[i - 1].offsetTop + anchors[i - 1].clientHeight;
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
+            toAnchorPos = anchors[i].offsetTop;
+            break;
+        } else if (scrollLine < parseInt(anchors[i].getAttribute("data-src-line-end"))) {
+            fromAnchorLine = parseInt(anchors[i].getAttribute("data-src-line"));
+            fromAnchorPos = anchors[i].offsetTop;
+            toAnchorLine = parseInt(anchors[i].getAttribute("data-src-line-end"));
+            toAnchorPos = anchors[i].offsetTop + anchors[i].clientHeight;
             break;
         }
     }
 
-    if (targetAnchor || nextAnchor) {
-        let targetLine = targetAnchor ? parseInt(targetAnchor.getAttribute("data-src-line")) : 0;
-        let nextLine = nextAnchor ? parseInt(nextAnchor.getAttribute("data-src-line")) : editor.lineCount();
-        let lineRatio = (scrollLine - targetLine) / (nextLine - targetLine)
-        if (!Number.isFinite(lineRatio)) lineRatio = 0.5;
+    let lineRatio = (scrollLine + lineFraction - fromAnchorLine) / (toAnchorLine - fromAnchorLine)
+    if (fromAnchorLine == toAnchorLine) lineRatio = 0;
 
-        let targetPosition = targetAnchor ? targetAnchor.offsetTop : 0;
-        let nextPosition = nextAnchor ? nextAnchor.offsetTop : preview.scrollHeight;
-        let finalPosition = targetPosition + (nextPosition - targetPosition) * lineRatio;
-        finalPosition -= scrollRatio * preview.clientHeight;
-        
-        syncScrollAntiRecursion = true;
-        preview.scrollTop = finalPosition;
-    }
+    let finalPosition = fromAnchorPos + (toAnchorPos - fromAnchorPos) * lineRatio;
+    finalPosition -= scrollRatio * preview.clientHeight;
+    
+    syncScrollAntiRecursion = true;
+    preview.scrollTop = finalPosition;
 }
 
 
