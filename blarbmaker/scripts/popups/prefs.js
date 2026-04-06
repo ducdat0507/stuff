@@ -123,11 +123,70 @@ popups.prefs = {
                 }
             ),
             this.makeBooleanField(
-                "Fancy-pants typography",
+                "Show preview iframe on link click",
                 "Disabled", "Enabled",
-                meta.prefs.fancyPants,
+                meta.prefs.linkPreviewFrame,
                 (value) => {
-                    meta.prefs.fancyPants = value;
+                    meta.prefs.linkPreviewFrame = value;
+                    saveMeta();
+                }
+            ),
+            this.makeCategoryHeader("Fancy-pants typography"),
+            this.makeBooleanField(
+                "Replace legal symbols ((c) → ©, (r) → ®, (tm) → ™)",
+                "Disabled", "Enabled",
+                meta.prefs.replaceLegalSymbols,
+                (value) => {
+                    meta.prefs.replaceLegalSymbols = value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Replace math symbols (+- → ±)",
+                "Disabled", "Enabled",
+                meta.prefs.replaceMathSymbols,
+                (value) => {
+                    meta.prefs.replaceMathSymbols = value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
+                }
+            ),
+            this.makeChoiceField(
+                "Replace dashes (-- → –, --- → —)",
+                {
+                    "0": "Disabled", 
+                    "1": "Enabled",
+                    "2": "Inverted",
+                },
+                meta.prefs.replaceDashes,
+                (value) => {
+                    meta.prefs.replaceDashes = +value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Replace ellipses (... → …)",
+                "Disabled", "Enabled",
+                meta.prefs.replaceEllipses,
+                (value) => {
+                    meta.prefs.replaceEllipses = value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Correct punctuation size (..... → …, ????? → ???, !!!!! → !!!)",
+                "Disabled", "Enabled",
+                meta.prefs.correctEllipses,
+                (value) => {
+                    meta.prefs.correctEllipses = value;
+                    updatePrefs(); onEditTimeout(); saveMeta();
+                }
+            ),
+            this.makeBooleanField(
+                "Smart quotes ('quote' → ‘quote’, \"quote\" → “quote”)",
+                "Disabled", "Enabled",
+                meta.prefs.smartQuotes,
+                (value) => {
+                    meta.prefs.smartQuotes = value;
                     updatePrefs(); onEditTimeout(); saveMeta();
                 }
             ),

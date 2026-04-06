@@ -357,6 +357,8 @@ a {
 }
 .prefs-field h4 {
     margin: 0;
+    margin-left: 1em;
+    width: calc(100% - 1em);
     margin-bottom: 0.25em;
     padding-block: 0.25em 0.25em;
     border-bottom: 2px solid #fff2;
@@ -365,11 +367,28 @@ a {
 }
 
 .field-choice-options {
-    display: flex;
+    display: grid;
     gap: 0.25em;
-    padding-left: 1em;
+    padding-left: 2em;
+    grid-template-columns: repeat(3, 1fr);
 }
 .field-choice-options button[aria-selected="true"] {
     background: white;
     color: #333;
+}
+
+.preview-frame {
+    width: 100%;
+    height: min(calc(100dvh - 10em), 40em);
+    position: relative;
+}
+
+.preview-frame iframe {
+    width: 200%;
+    height: 200%;
+    position: absolute;
+    transform: scale(0.5);
+    transform-origin: top left;
+    pointer-events: none;
+    overflow: hidden;
 }

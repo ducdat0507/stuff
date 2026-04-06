@@ -2,7 +2,9 @@ popups.storage = {
     build(popup) {
         popup.$title.textContent = "Storage";
 
-        for (let item in meta.posts) {
+        let postIds = Object.keys(meta.posts).sort((x, y) => meta.posts[y].lastEdited - meta.posts[x].lastEdited)
+
+        for (let item of postIds) {
             let postBox = document.createElement("section");
             postBox.className = "storage-post-box";
             popup.$content.append(postBox);

@@ -34,7 +34,7 @@ let md = new markdownit({
     } catch {
         md.metadata = null;
     }
-}).use(ext.sourceMap).use(ext.underline)
+}).use(ext.sourceMap).use(ext.underline).use(ext.replacements)
 
 let postInputInstance = CodeMirror(elms.postInputHolder, {
     lineNumbers: false,
@@ -72,6 +72,7 @@ function onEditTimeout() {
 }
 
 function onLinkClick(e) {
+    createPopup(popups.preview, e.target.href);
     e.preventDefault();
 }
 

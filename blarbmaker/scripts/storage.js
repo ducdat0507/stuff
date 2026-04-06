@@ -9,7 +9,14 @@ function getNewMeta() {
         prefs: {
             justify: "none",
             previewLineHeight: "normal",
-            fancyPants: true,
+            replaceLegalSymbols: true,
+            replaceMathSymbols: true,
+            replaceDashes: 2,
+            replaceEllipses: true,
+            correctEllipses: false,
+            smartQuotes: true,
+
+            linkPreviewFrame: false,
             showLineNumbers: false,
             showWhitespaces: false,
             wrapLongLines: true,
