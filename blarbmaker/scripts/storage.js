@@ -9,6 +9,8 @@ function getNewMeta() {
         prefs: {
             justify: "none",
             previewLineHeight: "normal",
+
+            fancyPants: true,
             replaceLegalSymbols: true,
             replaceMathSymbols: true,
             replaceDashes: 2,

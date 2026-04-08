@@ -8,7 +8,11 @@ body {
 
     color: white;
     font-size: max(1em, 16px);
-    font-family: Arial, Helvetica, sans-serif;
+    font-family: Inter, Arial, Helvetica, sans-serif;
+}
+
+code, pre, .CodeMirror {
+    font-family: "Roboto Mono", monospace;
 }
 
 iconify-icon {
@@ -17,8 +21,17 @@ iconify-icon {
     height: 1em;
 }
 
-button {
+button, .button {
     margin: 0;
+}
+
+button.icon-button, .button.icon-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    aspect-ratio: 1;
+    flex-grow: 0 !important;
+    padding: 0;
 }
 
 a {
@@ -375,6 +388,10 @@ a {
 .field-choice-options button[aria-selected="true"] {
     background: white;
     color: #333;
+}
+
+.field-button > .field-choice-options {
+    grid-template-columns: repeat(1, 1fr);
 }
 
 .preview-frame {

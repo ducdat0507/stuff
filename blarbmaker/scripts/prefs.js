@@ -6,12 +6,12 @@ function updatePrefs() {
     elms.postPreview.classList.toggle("line-height-wide", meta.prefs.previewLineHeight == "wide");
 
     md.set({
-        replaceLegalSymbols: meta.prefs.replaceLegalSymbols,
-        replaceMathSymbols: meta.prefs.replaceMathSymbols,
-        replaceDashes: meta.prefs.replaceDashes,
-        replaceEllipses: meta.prefs.replaceEllipses,
-        correctEllipses: meta.prefs.correctEllipses,
-        typographer: meta.prefs.smartQuotes,
+        replaceLegalSymbols: meta.prefs.fancyPants && meta.prefs.replaceLegalSymbols,
+        replaceMathSymbols: meta.prefs.fancyPants && meta.prefs.replaceMathSymbols,
+        replaceDashes: meta.prefs.fancyPants && meta.prefs.replaceDashes,
+        replaceEllipses: meta.prefs.fancyPants && meta.prefs.replaceEllipses,
+        correctEllipses: meta.prefs.fancyPants && meta.prefs.correctEllipses,
+        typographer: meta.prefs.fancyPants && meta.prefs.smartQuotes,
     })
 
     postInputInstance.setOption("lineNumbers", !!meta.prefs.showLineNumbers);

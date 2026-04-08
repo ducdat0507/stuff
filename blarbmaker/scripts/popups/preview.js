@@ -1,7 +1,7 @@
 popups.preview = {
     build(popup, href) {
         let url = new URL(href);
-        popup.$title.textContent = url.origin;
+        popup.$title.textContent = "Preview";
 
         if (meta.prefs.linkPreviewFrame) {
             let iframeBox = document.createElement("div");

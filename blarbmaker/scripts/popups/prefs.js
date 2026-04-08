@@ -1,65 +1,11 @@
 popups.prefs = {
 
-    makeCategoryHeader(title) {
-        let heading = document.createElement("h3");
-        heading.className = "prefs-category-header";
-        heading.textContent = title;
-        return heading;
-    },
-
-    makeChoiceField(title, options, value, callback) {
-        let div = document.createElement("div");
-        div.className = "prefs-field field-choice";
-
-        let labelElm = document.createElement("h4");
-        labelElm.textContent = title;
-        div.append(labelElm);
-
-        let optionsElm = document.createElement("div");
-        optionsElm.className = "field-choice-options";
-        div.append(optionsElm);
-
-        let buttons = {}
-
-        function setOption(value) {
-            for (let option in buttons) {
-                buttons[option].ariaSelected = option == value;
-            }
-        }
-
-        for (let option in options) {
-            let button = document.createElement("button");
-            button.dataset["option"] = option;
-            button.textContent = options[option];
-            button.onclick = () => {
-                let option = button.dataset["option"];
-                setOption(option);
-                callback(option);
-            };
-            optionsElm.append(button);
-            buttons[option] = button;
-        }
-
-        setOption(value);
-        
-        return div;
-    },
-
-    makeBooleanField(title, falseText, trueText, value, callback) {
-        return this.makeChoiceField(title, {
-            false: falseText,
-            true: trueText,
-        }, !!value ? "true" : "false", (val) => {
-            callback(val == "true");
-        });
-    },
-
     build(popup) {
         popup.$title.textContent = "Preferences";
 
         popup.$content.append(
-            this.makeCategoryHeader("Editor"),
-            this.makeBooleanField(
+            form.makeCategoryHeader("Editor"),
+            form.makeBooleanField(
                 "Line numbers",
                 "Hidden", "Shown",
                 meta.prefs.showLineNumbers,
@@ -68,7 +14,7 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeBooleanField(
+            form.makeBooleanField(
                 "Whitespaces",
                 "Hidden", "Shown",
                 meta.prefs.showWhitespaces,
@@ -77,7 +23,7 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeBooleanField(
+            form.makeBooleanField(
                 "Wrap long lines",
                 "Disabled", "Enabled",
                 meta.prefs.wrapLongLines,
@@ -86,7 +32,7 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeBooleanField(
+            form.makeBooleanField(
                 "Sync scroll positions",
                 "Disabled", "Enabled",
                 meta.prefs.syncScroll,
@@ -95,8 +41,8 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeCategoryHeader("Preview"),
-            this.makeChoiceField(
+            form.makeCategoryHeader("Preview"),
+            form.makeChoiceField(
                 "Justify text",
                 {
                     none: "None",
@@ -109,7 +55,7 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeChoiceField(
+            form.makeChoiceField(
                 "Line height",
                 {
                     tight: "Tight",
@@ -122,7 +68,7 @@ popups.prefs = {
                     updatePrefs(); saveMeta();
                 }
             ),
-            this.makeBooleanField(
+            form.makeBooleanField(
                 "Show preview iframe on link click",
                 "Disabled", "Enabled",
                 meta.prefs.linkPreviewFrame,
@@ -131,63 +77,19 @@ popups.prefs = {
                     saveMeta();
                 }
             ),
-            this.makeCategoryHeader("Fancy-pants typography"),
-            this.makeBooleanField(
-                "Replace legal symbols ((c) → ©, (r) → ®, (tm) → ™)",
+            form.makeBooleanField(
+                "Fancy-pants typography",
                 "Disabled", "Enabled",
-                meta.prefs.replaceLegalSymbols,
+                meta.prefs.fancyPants,
                 (value) => {
-                    meta.prefs.replaceLegalSymbols = value;
+                    meta.prefs.fancyPants = value;
                     updatePrefs(); onEditTimeout(); saveMeta();
                 }
             ),
-            this.makeBooleanField(
-                "Replace math symbols (+- → ±)",
-                "Disabled", "Enabled",
-                meta.prefs.replaceMathSymbols,
-                (value) => {
-                    meta.prefs.replaceMathSymbols = value;
-                    updatePrefs(); onEditTimeout(); saveMeta();
-                }
-            ),
-            this.makeChoiceField(
-                "Replace dashes (-- → –, --- → —)",
-                {
-                    "0": "Disabled", 
-                    "1": "Enabled",
-                    "2": "Inverted",
-                },
-                meta.prefs.replaceDashes,
-                (value) => {
-                    meta.prefs.replaceDashes = +value;
-                    updatePrefs(); onEditTimeout(); saveMeta();
-                }
-            ),
-            this.makeBooleanField(
-                "Replace ellipses (... → …)",
-                "Disabled", "Enabled",
-                meta.prefs.replaceEllipses,
-                (value) => {
-                    meta.prefs.replaceEllipses = value;
-                    updatePrefs(); onEditTimeout(); saveMeta();
-                }
-            ),
-            this.makeBooleanField(
-                "Correct punctuation size (..... → …, ????? → ???, !!!!! → !!!)",
-                "Disabled", "Enabled",
-                meta.prefs.correctEllipses,
-                (value) => {
-                    meta.prefs.correctEllipses = value;
-                    updatePrefs(); onEditTimeout(); saveMeta();
-                }
-            ),
-            this.makeBooleanField(
-                "Smart quotes ('quote' → ‘quote’, \"quote\" → “quote”)",
-                "Disabled", "Enabled",
-                meta.prefs.smartQuotes,
-                (value) => {
-                    meta.prefs.smartQuotes = value;
-                    updatePrefs(); onEditTimeout(); saveMeta();
+            form.makeButton(
+                "", "Show detailed options",
+                () => {
+                    createPopup(popups.prefsFancyPants);
                 }
             ),
         );

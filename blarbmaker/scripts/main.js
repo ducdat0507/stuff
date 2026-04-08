@@ -208,10 +208,13 @@ elms.postPreview.addEventListener("scroll", (e) => {
 }, { passive: true })
 
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
+    let startSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
+    if (startSize != startSize) startSize = 0.5;
+    let startPos = e.clientY;
     function moveEvent(e) {
-        let currentSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
-        currentSize += e.movementY / elms.postComposerContainer.clientHeight;
+        let currentSize = (e.clientY - startPos) / elms.postComposerContainer.clientHeight + startSize;
         currentSize = Math.min(Math.max(currentSize, 0), 1);
+        if (currentSize != currentSize) currentSize = 0.5;
         elms.mainContainer.style.setProperty("--preview-size", currentSize)
     }
     function upEvent(e) {

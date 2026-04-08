@@ -24,14 +24,20 @@
         <script src="scripts/toolbar.js"></script>
         <script src="scripts/utils.js"></script>
         <script src="scripts/prefs.js"></script>
+        <script src="scripts/form.js"></script>
 
         <script src="scripts/popup.js"></script>
         <script src="scripts/popups/storage.js"></script>
         <script src="scripts/popups/prefs.js"></script>
+        <script src="scripts/popups/prefsFancyPants.js"></script>
         <script src="scripts/popups/toc.js"></script>
         <script src="scripts/popups/preview.js"></script>
+        <script src="scripts/popups/deletePost.js"></script>
 
         <script defer src="scripts/main.js"></script>
+
+        
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap" rel="stylesheet">
 
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/lib/codemirror.css">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/codemirror@6.65.7/theme/ayu-dark.css">
@@ -48,13 +54,13 @@
             <div id="post-composer-container">
                 <div id="post-preview"></div>
                 <div id="post-toolbar" class="tool-bar">
-                    <div id="post-resize-handle">
-                        <iconify-icon icon="lucide:grip" style="opacity: 0.5"></iconify-icon>
-                    </div>
-                    <hr/>
                     <div id="post-toolbar-items" class="filler"></div>
                     <hr/>
                     <div id="post-toolbar-side-items"></div>
+                    <hr/>
+                    <div id="post-resize-handle">
+                        <iconify-icon icon="lucide:grip" style="opacity: 0.5"></iconify-icon>
+                    </div>
                 </div>
                 <div id="post-input-holder">
                 </div>
