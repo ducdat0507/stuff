@@ -2,7 +2,7 @@ popups.toc = {
     build(popup) {
         popup.$title.textContent = "Table of Contents";
 
-        let headings = elms.postPreview.querySelectorAll("h1, h2, h3, h4, h5, h6");
+        let headings = elms.postPreview.querySelectorAll("[data-src-line]:is(h1, h2, h3, h4, h5, h6)");
         let levels = []
         for (let heading of headings) {
             let button = document.createElement("button");
@@ -16,7 +16,8 @@ popups.toc = {
             button.textContent = heading.textContent;
             button.className = "toc-button toc-button-" + levels.length;
             button.onclick = () => {
-                postInputInstance.scrollIntoView({line: parseInt(heading.getAttribute("data-src-line") || 0)})
+                postInputInstance.scrollTo(0, postInputInstance.heightAtLine(parseInt(heading.getAttribute("data-src-line") || 0), "local"))
+                if (!meta.prefs.syncScroll) heading.scrollIntoView({block: "start"});
                 popup.close();
             }
             popup.$content.append(button);

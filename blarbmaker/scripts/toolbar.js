@@ -116,17 +116,26 @@ function makeToolbarFiller() {
     return div;
 }
 
+function makeToolbarTitle() {
+    let div = document.createElement("div");
+    div.id = "navigation-bar-title"
+    div.className = "filler";
+    
+    return div;
+}
+
 function initToolbar() {
     elms.navigationBar.append(
         makeToolbarButton("Storage", "lucide:save", () => {
             createPopup(popups.storage);
         }),
         document.createElement("hr"),
-        makeToolbarFiller(),
+        elms.navigationBarTitle = makeToolbarTitle(),
         document.createElement("hr"),
         makeToolbarButton("Table of Contents", "lucide:list-tree", () => {
             createPopup(popups.toc);
         }),
+        document.createElement("hr"),
         makeToolbarButton("Preferences", "lucide:wrench", () => {
             createPopup(popups.prefs);
         }),
@@ -149,6 +158,15 @@ function initToolbar() {
             postInputInstance.focus();
         }),
         document.createElement("hr"),
+        makeToolbarButton("Link", "lucide:link", () => {
+            makeLinkAtSelection();
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Image", "lucide:image", () => {
+            makeLinkAtSelection("![");
+            postInputInstance.focus();
+        }),
+        document.createElement("hr"),
         makeToolbarButton("Heading", "lucide:type", () => {
             makeHeadingAtSelection();
             postInputInstance.focus();
@@ -162,15 +180,6 @@ function initToolbar() {
             postInputInstance.focus();
         }),
         document.createElement("hr"),
-        makeToolbarButton("Link", "lucide:link", () => {
-            makeLinkAtSelection();
-            postInputInstance.focus();
-        }),
-        makeToolbarButton("Image", "lucide:image", () => {
-            makeLinkAtSelection("![");
-            postInputInstance.focus();
-        }),
-        document.createElement("hr"),
     )
     elms.postToolbarSideItems.append(
         makeToolbarButton("Undo", "lucide:undo", () => {
@@ -178,7 +187,7 @@ function initToolbar() {
             postInputInstance.focus();
         }),
         makeToolbarButton("Redo", "lucide:redo", () => {
-            postInputInstance.undo();
+            postInputInstance.redo();
             postInputInstance.focus();
         }),
     ) 

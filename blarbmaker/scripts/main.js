@@ -8,6 +8,7 @@ window.onerror = (msg, source, lineNo, colNo, error) => {
 let elms = {
     mainContainer: document.querySelector("#main-container"),
     navigationBar: document.querySelector("#navigation-bar"),
+    navigationBarTitle: document.querySelector("#navigation-bar-title"),
     postInputHolder: document.querySelector("#post-input-holder"),
     postComposerContainer: document.querySelector("#post-composer-container"),
     postToolbar: document.querySelector("#post-toolbar"),
@@ -59,6 +60,7 @@ function onEditTimeout() {
         `);
     }
     meta.posts[meta.currentPost].title = metadata?.title ?? "";
+    elms.navigationBarTitle.textContent = metadata?.title ?? "(Unnamed post)";
 
     if (!elms.postPreview.innerHTML) {
         elms.postPreview.innerHTML = `
@@ -207,12 +209,17 @@ elms.postPreview.addEventListener("scroll", (e) => {
     }
 }, { passive: true })
 
+var horizontalEditorTest = matchMedia("screen and (min-width: 64em)")
+
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     let startSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
     if (startSize != startSize) startSize = 0.5;
-    let startPos = e.clientY;
+    let isHorizontal = horizontalEditorTest.matches;
+    let startPos = isHorizontal ? e.clientX : e.clientY;
     function moveEvent(e) {
-        let currentSize = (e.clientY - startPos) / elms.postComposerContainer.clientHeight + startSize;
+        let axisPos = isHorizontal ? e.clientX : e.clientY;
+        let axisSize = elms.postComposerContainer[isHorizontal ? "clientWidth" : "clientHeight"];
+        let currentSize = (axisPos - startPos) / axisSize + startSize;
         currentSize = Math.min(Math.max(currentSize, 0), 1);
         if (currentSize != currentSize) currentSize = 0.5;
         elms.mainContainer.style.setProperty("--preview-size", currentSize)

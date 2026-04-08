@@ -67,20 +67,34 @@ a {
     height: calc(2em + 2px);
     border-bottom: 2px solid #fff2;
 }
+#navigation-bar-title {
+    display: flex;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    align-items: center;
+    padding-inline: 0.5em;
+}
 
 #post-composer-container {
-    display: flex;
-    flex-flow: column;
+    display: grid;
+    grid-template: 
+        "post-preview post-preview"       calc(calc(100% - 2em - 4px) * var(--preview-size, 0.5))
+        "post-toolbar post-resize-handle" calc(2em + 4px)
+        "post-input   post-input"         1fr
+        / 1fr 2em;
     height: 0;
     flex-grow: 1;
 }
 
 #post-preview {
-    height: 0;
-    flex-grow: var(--preview-size, 0.5);
+    grid-area: post-preview;
+
     line-height: 1.25;
 
     padding: 0 1rem;
+    min-width: 0;
+    min-height: 0;
 
     overflow-y: auto;
     touch-action: manipulation;
@@ -158,6 +172,8 @@ a {
 }
 
 #post-toolbar {
+    grid-area: post-toolbar;
+
     height: calc(2em + 4px);
     border-block: 2px solid #fff2;
     background: #111;
@@ -180,6 +196,8 @@ a {
 }
 
 #post-resize-handle {
+    grid-area: post-resize-handle;
+
     width: 2em;
     display: flex;
 
@@ -204,6 +222,7 @@ a {
     color: white;
     border: none;
     border-radius: 0;
+    flex-shrink: 0;
     font: inherit;
 
     align-items: center;
@@ -218,10 +237,12 @@ a {
 
 
 #post-input-holder {
-    height: 0;
-    flex-grow: calc(1 - var(--preview-size, 0.5));
+    grid-area: post-input;
 
     position: relative;
+
+    min-width: 0;
+    min-height: 0;
 }
 
 #post-input-holder > * {
@@ -322,7 +343,8 @@ a {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     line-clamp: 2;
-    -webkitline-clamp: 2;
+    -webkit-line-clamp: 2;
+    overflow: hidden;
     font-size: 1.25em;
 }
 
@@ -418,22 +440,48 @@ a {
     text-align: start;
     text-decoration: underline 1px solid #fff7;
     cursor: pointer;
+    display: list-item;
 }
 .toc-button-1 {
-    margin-inline-start: 0;
+    margin-inline-start: 1em;
+    list-style-type: "+";
 }
 .toc-button-2 {
-    margin-inline-start: 1em;
+    margin-inline-start: 2em;
+    list-style-type: "-";
 }
 .toc-button-3 {
-    margin-inline-start: 2em;
+    margin-inline-start: 3em;
+    list-style-type: "∗";
 }
 .toc-button-4 {
-    margin-inline-start: 3em;
-}
-.toc-button-5 {
     margin-inline-start: 4em;
+    list-style-type: "•";
 }
 .toc-button-5 {
     margin-inline-start: 5em;
+    list-style-type: "◦";
+}
+.toc-button-6 {
+    margin-inline-start: 6em;
+    list-style-type: ">";
+}
+
+@media screen and (min-width: 64em) {
+    #post-composer-container {
+        grid-template: 
+            "post-toolbar post-resize-handle post-preview" calc(2em + 2px)
+            "post-input   post-resize-handle post-preview" 1fr
+            / calc(calc(100% - 1em) * var(--preview-size, 0.5)) 1em 1fr;
+    }
+    #post-toolbar {
+        border-top: none;
+        height: calc(2em + 2px);
+    }
+    #post-resize-handle {
+        width: 1em;
+    }
+    #post-resize-handle iconify-icon {
+        font-size: 0.7em;
+    }
 }
