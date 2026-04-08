@@ -392,3 +392,31 @@ a {
     pointer-events: none;
     overflow: hidden;
 }
+
+.toc-button {
+    background: none;
+    border: none;
+    font: inherit;
+    color: inherit;
+    text-align: start;
+    text-decoration: underline 1px solid #fff7;
+    cursor: pointer;
+}
+.toc-button-1 {
+    margin-inline-start: 0;
+}
+.toc-button-2 {
+    margin-inline-start: 1em;
+}
+.toc-button-3 {
+    margin-inline-start: 2em;
+}
+.toc-button-4 {
+    margin-inline-start: 3em;
+}
+.toc-button-5 {
+    margin-inline-start: 4em;
+}
+.toc-button-5 {
+    margin-inline-start: 5em;
+}

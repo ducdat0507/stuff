@@ -124,6 +124,9 @@ function initToolbar() {
         document.createElement("hr"),
         makeToolbarFiller(),
         document.createElement("hr"),
+        makeToolbarButton("Table of Contents", "lucide:list-tree", () => {
+            createPopup(popups.toc);
+        }),
         makeToolbarButton("Preferences", "lucide:wrench", () => {
             createPopup(popups.prefs);
         }),
