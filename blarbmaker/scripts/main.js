@@ -22,6 +22,8 @@ let elms = {
 
 let editTimeout = 0;
 
+let horizontalEditorTest = matchMedia("screen and (min-width: 64em)");
+
 
 
 let md = new markdownit({
@@ -66,7 +68,7 @@ function onEditTimeout() {
         elms.postPreview.innerHTML = `
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
             <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on the go with my phone</p>
-            <p style="opacity: 0.5">just write some markdown on the box below and a preview will be shown here</p>
+            <p style="opacity: 0.5">just write some markdown on the box ${horizontalEditorTest.matches ? "on the left" : "below"} and a preview will be shown here</p>
         `;
     }
 
@@ -209,8 +211,6 @@ elms.postPreview.addEventListener("scroll", (e) => {
     }
 }, { passive: true })
 
-var horizontalEditorTest = matchMedia("screen and (min-width: 64em)")
-
 elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     let startSize = parseFloat(elms.mainContainer.style.getPropertyValue("--preview-size"));
     if (startSize != startSize) startSize = 0.5;
@@ -219,9 +219,16 @@ elms.postResizeHandle.addEventListener("pointerdown", (e) => {
     function moveEvent(e) {
         let axisPos = isHorizontal ? e.clientX : e.clientY;
         let axisSize = elms.postComposerContainer[isHorizontal ? "clientWidth" : "clientHeight"];
+
+
         let currentSize = (axisPos - startPos) / axisSize + startSize;
         currentSize = Math.min(Math.max(currentSize, 0), 1);
         if (currentSize != currentSize) currentSize = 0.5;
+        else if (currentSize < 0.125) currentSize = 0;
+        else if (currentSize < 0.25) currentSize = 0.25;
+        else if (currentSize > 0.875) currentSize = 1;
+        else if (currentSize > 0.75) currentSize = 0.75;
+
         elms.mainContainer.style.setProperty("--preview-size", currentSize)
     }
     function upEvent(e) {

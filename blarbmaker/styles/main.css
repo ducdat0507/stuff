@@ -31,6 +31,7 @@ button.icon-button, .button.icon-button {
     justify-content: center;
     aspect-ratio: 1;
     flex-grow: 0 !important;
+    flex-shrink: 0 !important;
     padding: 0;
 }
 
@@ -73,7 +74,10 @@ a {
     text-overflow: ellipsis;
     white-space: nowrap;
     align-items: center;
-    padding-inline: 0.5em;
+    padding-inline: 0.6em;
+    font-size: 0.8em;
+    font-weight: bold;
+    color: #fffa;
 }
 
 #post-composer-container {
@@ -277,7 +281,7 @@ a {
     display: flex;
     position: fixed;
     inset: 0;
-    background: #0005;
+    background: #0007;
     align-items: center;
     justify-content: center;
 }
@@ -292,7 +296,7 @@ a {
 
     background: #111;
     border: 2px solid #fff7;
-    box-shadow: 0.5em 0.5em #0007;
+    box-shadow: 0 0 0.5em #0007, 0.5em 0.5em #000a, 0 0 24em #fff3;
 }
 
 .popup-title {

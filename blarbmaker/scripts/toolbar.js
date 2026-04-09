@@ -126,7 +126,7 @@ function makeToolbarTitle() {
 
 function initToolbar() {
     elms.navigationBar.append(
-        makeToolbarButton("Storage", "lucide:save", () => {
+        makeToolbarButton("Storage", "lucide:hard-drive", () => {
             createPopup(popups.storage);
         }),
         document.createElement("hr"),
@@ -158,15 +158,6 @@ function initToolbar() {
             postInputInstance.focus();
         }),
         document.createElement("hr"),
-        makeToolbarButton("Link", "lucide:link", () => {
-            makeLinkAtSelection();
-            postInputInstance.focus();
-        }),
-        makeToolbarButton("Image", "lucide:image", () => {
-            makeLinkAtSelection("![");
-            postInputInstance.focus();
-        }),
-        document.createElement("hr"),
         makeToolbarButton("Heading", "lucide:type", () => {
             makeHeadingAtSelection();
             postInputInstance.focus();
@@ -177,6 +168,19 @@ function initToolbar() {
         }),
         makeToolbarButton("Numbered List", "tabler:list-numbers", () => {
             makeListAtSelection("1. ")
+            postInputInstance.focus();
+        }),
+        document.createElement("hr"),
+        makeToolbarButton("Link", "lucide:link", () => {
+            makeLinkAtSelection();
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Image", "lucide:image", () => {
+            makeLinkAtSelection("![");
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Inline code", "lucide:code", () => {
+            wrapAroundCursor("`", "`")
             postInputInstance.focus();
         }),
         document.createElement("hr"),
