@@ -9,6 +9,8 @@ body {
     color: white;
     font-size: max(1em, 16px);
     font-family: Inter, Arial, Helvetica, sans-serif;
+
+    --toolbar-button-size: 2em;
 }
 
 code, pre, .CodeMirror {
@@ -65,7 +67,7 @@ a {
 }
 
 #navigation-bar {
-    height: calc(2em + 2px);
+    height: calc(var(--toolbar-button-size) + 2px);
     border-bottom: 2px solid #fff2;
 }
 #navigation-bar-title {
@@ -83,10 +85,10 @@ a {
 #post-composer-container {
     display: grid;
     grid-template: 
-        "post-preview post-preview"       calc(calc(100% - 2em - 4px) * var(--preview-size, 0.5))
-        "post-toolbar post-resize-handle" calc(2em + 4px)
+        "post-preview post-preview"       calc(calc(100% - var(--toolbar-button-size) - 4px) * var(--preview-size, 0.5))
+        "post-toolbar post-resize-handle" calc(var(--toolbar-button-size) + 4px)
         "post-input   post-input"         1fr
-        / 1fr 2em;
+        / 1fr var(--toolbar-button-size);
     height: 0;
     flex-grow: 1;
 }
@@ -178,7 +180,7 @@ a {
 #post-toolbar {
     grid-area: post-toolbar;
 
-    height: calc(2em + 4px);
+    height: calc(var(--toolbar-button-size) + 4px);
     border-block: 2px solid #fff2;
     background: #111;
 
@@ -205,7 +207,7 @@ a {
 #post-resize-handle {
     grid-area: post-resize-handle;
 
-    width: 2em;
+    width: var(--toolbar-button-size);
     display: flex;
 
     align-items: center;
@@ -222,7 +224,8 @@ a {
 }
 
 .tool-bar-button {
-    width: 2em;
+    width: var(--toolbar-button-size);
+    height: var(--toolbar-button-size);
     display: flex;
 
     background: #222;
@@ -238,7 +241,7 @@ a {
 .tool-bar-button:hover {
     background: #333;
 }
-.tool-bar-button:acttive {
+.tool-bar-button:active {
     background: #444;
 }
 
@@ -474,16 +477,31 @@ a {
     list-style-type: ">";
 }
 
+@media (pointer: coarse) {
+    body {
+        --toolbar-button-size: 2.4em;
+    }
+    #navigation-bar-title {
+        padding-inline: 0.9em;
+    }
+    .tool-bar-button iconify-icon {
+        font-size: 1.25em;
+    }
+    #post-resize-handle iconify-icon {
+        font-size: 1.15em;
+    }
+}
+
 @media screen and (min-width: 64em) {
     #post-composer-container {
         grid-template: 
-            "post-toolbar post-resize-handle post-preview" calc(2em + 2px)
+            "post-toolbar post-resize-handle post-preview" calc(var(--toolbar-button-size) + 2px)
             "post-input   post-resize-handle post-preview" 1fr
             / calc(calc(100% - 1em) * var(--preview-size, 0.5)) 1em 1fr;
     }
     #post-toolbar {
         border-top: none;
-        height: calc(2em + 2px);
+        height: calc(var(--toolbar-button-size) + 2px);
     }
     #post-resize-handle {
         width: 1em;

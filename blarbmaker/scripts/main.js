@@ -91,6 +91,7 @@ function syncScrollEditorToPreview() {
     scrollPosition += scrollRatio * preview.clientHeight;
 
     let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
+    if (!anchors.length) return;
     let fromAnchorLine = 0, toAnchorLine = 0;
     let fromAnchorPos = 0, toAnchorPos = 0;
     if (scrollPosition >= anchors.at(-1).offsetTop + anchors.at(-1).clientHeight) {
@@ -143,6 +144,7 @@ function syncScrollPreviewToEditor() {
     let lineFraction = (scrollPosition - lineStartPos) / (lineEndPos - lineStartPos);
 
     let anchors = [...elms.postPreview.querySelectorAll("[data-src-line]")];
+    if (!anchors.length) return;
     let fromAnchorLine = 0, toAnchorLine = 0;
     let fromAnchorPos = 0, toAnchorPos = 0;
     if (scrollLine >= parseInt(anchors.at(-1).getAttribute("data-src-line-end"))) {
