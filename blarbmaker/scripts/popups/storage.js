@@ -64,8 +64,8 @@ popups.storage = {
             uploadBtn.innerHTML = `<iconify-icon icon="lucide:download" aria-label="Download"></iconify-icon>`;
             uploadBtn.onclick = () => {
                 let a = document.createElement("a");
-                a.href = "data:application/md," + encodeURIComponent(localStorage.getItem(item));
-                a.download = item + ".md";
+                a.href = "data:text/markdown," + encodeURIComponent(localStorage.getItem(item));
+                a.download = (meta.posts[item].title || item) + ".md";
                 a.click();
             }
             postBoxActions.append(uploadBtn);

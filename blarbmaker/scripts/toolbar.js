@@ -170,6 +170,14 @@ function initToolbar() {
             makeListAtSelection("1. ")
             postInputInstance.focus();
         }),
+        makeToolbarButton("Blockquote", "lucide:quote", () => {
+            makeListAtSelection("> ")
+            postInputInstance.focus();
+        }),
+        makeToolbarButton("Code Block", "lucide:square-code", () => {
+            wrapAroundCursor("```\n", "\n```")
+            postInputInstance.focus();
+        }),
         document.createElement("hr"),
         makeToolbarButton("Link", "lucide:link", () => {
             makeLinkAtSelection();

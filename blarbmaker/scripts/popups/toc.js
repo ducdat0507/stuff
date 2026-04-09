@@ -23,6 +23,13 @@ popups.toc = {
             popup.$content.append(button);
         }
 
+        if (!levels.length) {
+            popup.$title.textContent = "No Table of Contents?";
+            popup.$content.insertAdjacentHTML("beforeend", `
+                <div>Insert headings into your markdown file and they'll appear here.</div>
+            `)
+        }
+
         let closeBtn = document.createElement("button");
         closeBtn.textContent = "Close";
         closeBtn.onclick = () => {
