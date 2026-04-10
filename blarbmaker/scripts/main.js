@@ -73,6 +73,8 @@ function onEditTimeout() {
     }
 
     elms.postPreview.querySelectorAll("a").forEach(a => a.addEventListener("click", onLinkClick));
+
+    editTimeout = 0;
 }
 
 function onLinkClick(e) {
@@ -186,7 +188,7 @@ function syncScrollPreviewToEditor() {
 
 
 postInputInstance.on("change", (e) => {
-    if (editTimeout) clearTimeout(editTimeout);
+    if (editTimeout) return;
     editTimeout = setTimeout(() => {
         onEditTimeout();
         savePost();

@@ -479,16 +479,16 @@ a {
 
 @media (pointer: coarse) {
     body {
-        --toolbar-button-size: 2.4em;
+        --toolbar-button-size: 2.3em;
     }
     #navigation-bar-title {
-        padding-inline: 0.9em;
+        padding-inline: 0.8em;
     }
     .tool-bar-button iconify-icon {
-        font-size: 1.25em;
+        font-size: 1.2em;
     }
     #post-resize-handle iconify-icon {
-        font-size: 1.15em;
+        font-size: 1.1em;
     }
 }
 
