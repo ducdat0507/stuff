@@ -34,6 +34,7 @@ let bingoBoards = {
             "Has pixel art graphics scattered everywhere",
             "Recommends W3Schools as a reputable resource site",
             `<span style='font-family: "MS Gothic", sans-serif'>MS Gothic</span> or <span style='font-family: "MS PGothic", sans-serif'>MS PGothic</span> font`,
+            "日本語 (Japanese)",
             
             [
                 `"Copying is an act of love, please copy" under site footer`,
