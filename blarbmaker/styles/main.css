@@ -106,6 +106,10 @@ a {
     touch-action: manipulation;
 }
 
+#post-preview :is(p, h1, h2, h3, h4, h5, h6) {
+    margin-block: 1rem;
+}
+
 #post-preview img {
     max-width: min(100%, 40em);
 }
@@ -161,6 +165,13 @@ a {
 
 #post-preview :is(ol, ul, blockquote) blockquote {
     margin-inline-start: 0em;
+}
+
+#post-preview hgroup > :not(:first-child) {
+    margin-top: 0.125em;
+}
+#post-preview hgroup > :not(:last-child) {
+    margin-bottom: 0.125em;
 }
 
 
@@ -277,10 +288,6 @@ a {
 .CodeMirror-activeline-background {
     padding-inline: 0.5em;
     margin-inline: -0.5em;
-}
-
-#post-preview :is(p, h1, h2, h3, h4, h5, h6) {
-    margin-block: 1rem;
 }
 
 .popup {

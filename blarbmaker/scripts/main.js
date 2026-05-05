@@ -56,10 +56,16 @@ function onEditTimeout() {
     elms.postPreview.innerHTML = md.render(value);
     let metadata = md.metadata;
     
-    if (metadata && metadata.title) {
-        elms.postPreview.insertAdjacentHTML("afterbegin", `
-            <h1>${metadata.title}</h1>    
-        `);
+    if (metadata) {
+        if (metadata.title) {
+            elms.postPreview.insertAdjacentHTML("afterbegin", `
+                <hgroup>
+                    <h1>${metadata.title}</h1>    
+                    ${metadata.subtitle ? `<p><i>${metadata.subtitle}</i></p>` : ""}
+                    <p><small><i>About ${Math.ceil(elms.postPreview.textContent.split(/\s+/).length / 200)} min reading time</i></small></p>
+                </hgroup>
+            `);
+        }
     }
     meta.posts[meta.currentPost].title = metadata?.title ?? "";
     elms.navigationBarTitle.textContent = metadata?.title ?? "(Unnamed post)";
@@ -69,6 +75,7 @@ function onEditTimeout() {
             <h1 style="opacity: 0.5">welcome to the blarbmaker</h1>
             <p style="opacity: 0.5">this is just a tool i whipped up to let me draft blarb posts on the go with my phone</p>
             <p style="opacity: 0.5">just write some markdown on the box ${horizontalEditorTest.matches ? "on the left" : "below"} and a preview will be shown here</p>
+            <p style="opacity: 0.5"><em>tip: add a <code>title</code> and <code>subtitle</code> field to the post's frontmatter to customize the post name</em></p>
         `;
     }
 
