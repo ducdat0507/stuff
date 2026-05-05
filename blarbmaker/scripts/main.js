@@ -62,7 +62,7 @@ function onEditTimeout() {
                 <hgroup>
                     <h1>${metadata.title}</h1>    
                     ${metadata.subtitle ? `<p><i>${metadata.subtitle}</i></p>` : ""}
-                    <p><small><i>About ${Math.ceil(elms.postPreview.textContent.split(/\s+/).length / 200)} min reading time</i></small></p>
+                    <p><small><i>About ${Math.ceil(elms.postPreview.textContent.length / 1200)} min reading time</i></small></p>
                 </hgroup>
             `);
         }
